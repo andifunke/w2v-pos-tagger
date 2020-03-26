@@ -144,3 +144,5 @@ dmypy.json
 
 .idea
 corpora
+Classifier*
+external
