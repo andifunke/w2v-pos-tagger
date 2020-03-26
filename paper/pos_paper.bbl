@@ -1,0 +1,72 @@
+\begin{thebibliography}{}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[{Brants et~al.(2004)Brants, Dipper, Eisenberg, Hansen-Schirra,
+  K{\"o}nig, Lezius, Rohrer, Smith, and Uszkoreit}]{Brants2004}
+Sabine Brants, Stefanie Dipper, Peter Eisenberg, Silvia Hansen-Schirra, Esther
+  K{\"o}nig, Wolfgang Lezius, Christian Rohrer, George Smith, and Hans
+  Uszkoreit. 2004.
+\newblock \href{https://doi.org/10.1007/s11168-004-7431-3}{Tiger: Linguistic
+  interpretation of a german corpus}.
+\newblock {\em Research on Language and Computation\/} 2(4):597--620.
+\newblock
+  \href{https://doi.org/10.1007/s11168-004-7431-3}{https://doi.org/10.1007/s11168-004-7431-3}.
+
+\bibitem[{Foth et~al.(2014)Foth, K{\"o}hn, Beuck, and Menzel}]{Foth14}
+Kilian Foth, Arne K{\"o}hn, Niels Beuck, and Wolfgang Menzel. 2014.
+\newblock Because size does matter: The hamburg dependency treebank.
+\newblock In {\em Proceedings of the Language Resources and Evaluation
+  Conference 2014 / European Language Resources Association (ELRA)\/}.
+  Universit{\"a}t Hamburg.
+
+\bibitem[{Hinton(1984)}]{hinton1984distributed}
+Geoffrey~E Hinton. 1984.
+\newblock Distributed representations .
+
+\bibitem[{Mikolov et~al.(2013)Mikolov, Chen, Corrado, and
+  Dean}]{mikolov2013efficient}
+Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean. 2013.
+\newblock Efficient estimation of word representations in vector space.
+\newblock {\em arXiv preprint arXiv:1301.3781\/} .
+
+\bibitem[{Nakagawa et~al.(2001)Nakagawa, Kudo, and
+  Matsumoto}]{nakagawa2001unknown}
+Tetsuji Nakagawa, Taku Kudo, and Yuji Matsumoto. 2001.
+\newblock Unknown word guessing and part-of-speech tagging using support vector
+  machines.
+\newblock In {\em NLPRS\/}. pages 325--331.
+
+\bibitem[{Pedregosa et~al.(2011)Pedregosa, Varoquaux, Gramfort, Michel,
+  Thirion, Grisel, Blondel, Prettenhofer, Weiss, Dubourg, Vanderplas, Passos,
+  Cournapeau, Brucher, Perrot, and Duchesnay}]{scikit-learn}
+F.~Pedregosa, G.~Varoquaux, A.~Gramfort, V.~Michel, B.~Thirion, O.~Grisel,
+  M.~Blondel, P.~Prettenhofer, R.~Weiss, V.~Dubourg, J.~Vanderplas, A.~Passos,
+  D.~Cournapeau, M.~Brucher, M.~Perrot, and E.~Duchesnay. 2011.
+\newblock Scikit-learn: Machine learning in {P}ython.
+\newblock {\em Journal of Machine Learning Research\/} 12:2825--2830.
+
+\bibitem[{Pennington et~al.(2014)Pennington, Socher, and
+  Manning}]{pennington2014glove}
+Jeffrey Pennington, Richard Socher, and Christopher~D Manning. 2014.
+\newblock Glove: Global vectors for word representation.
+\newblock In {\em EMNLP\/}. volume~14, pages 1532--1543.
+
+\bibitem[{Petrov(2017)}]{univmap}
+Slav Petrov. 2017.
+\newblock universal-pos-tags.
+\newblock \url{https://github.com/slavpetrov/universal-pos-tags}.
+\newblock Accessed: 2017-12-27.
+
+\bibitem[{Petrov et~al.(2011)Petrov, Das, and McDonald}]{petrov2011universal}
+Slav Petrov, Dipanjan Das, and Ryan McDonald. 2011.
+\newblock A universal part-of-speech tagset.
+\newblock {\em arXiv preprint arXiv:1104.2086\/} .
+
+\bibitem[{Schiller et~al.(1999)Schiller, Teufel, Stoeckert, and
+  Thielen}]{schiller1999}
+Anne Schiller, Simone Teufel, Christine Stoeckert, and Christine Thielen. 1999.
+\newblock Guidelines fuer das tagging deutscher textcorpora mit stts (kleines
+  und großes tagset).
+\newblock Technical report, Universitaet Stuttgart, Universitaet Tuebingen.
+
+\end{thebibliography}
