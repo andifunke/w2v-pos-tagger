@@ -1,6 +1,48 @@
 # w2v-pos-tagger
-A simple unigram word vector based part-of-speech tagger
 
+## Single Token Part-of-Speech Tagging using Support Vector Machines and Word Embedding Features
+
+
+w2v-pos-tagger his is a project submission to an NLP & IR class in *2017*. The task description
+was as follows:
+
+ * Train a Part-of-speech tagger for the German language.
+ * Use the [TIGER corpus](https://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger/) 
+   as training set.
+ * Use the [HDT corpus](https://corpora.uni-hamburg.de/hzsk/de/islandora/object/treebank:hdt)
+   as test set.
+ * Use the [STTS](http://www.sfs.uni-tuebingen.de/resources/stts-1999.pdf) as well as the
+   [Universal tagset](https://universaldependencies.org/u/pos/) as classes.
+ * Train a POS-tagger model on an 
+   [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
+   using an RBF kernel.
+ * Write Precision, Recall and F<sub>1</sub> score metrics.
+ * Compare the results to the pre-trained tagger of [spaCy](https://spacy.io/) 1.x and an 
+   [NLTK](https://www.nltk.org/) based tagger trained with the 
+   [ClassifierBasedGermanTagger](https://github.com/ptnplanet/NLTK-Contributions).
+ * Describe the results in a [course paper](paper/pos_paper_funke.pdf).
+ 
+The design for the feature engineering was part of the challenge. I decided for unigram word 
+vectors as features for the SVM and applied a comprehensive hyperparameter search for embedding
+types, vector sizes and SVM hyperparameters. This simple, yet effective, approach of learning 
+a hyperplane separation through the embedding space gave an F<sub>1</sub> score of 0.919 for the 
+best models. The approach demonstrates how well static unigram word vectors can represent syntactic 
+language features. The project is described in:
+
+* **A. Funke**: *Single Token Part-of-Speech Tagging using Support Vector Machines and
+  Word Embedding Features*. Course paper for "Natural Language Processing and Information 
+  Retrieval" (HHU 2017)  
+  [paper/pos_paper_funke.pdf](paper/pos_paper_funke.pdf)
+
+  **Abstract:**  
+  *Part-of-speech tagging (POS) is a common technique in Natural Language Processing pipelines. 
+  It enriches a corpus with grammatical information which can be exploited not only for syntactic 
+  but also for semantic evaluation. In this paper we propose an SVM based POS-tagger trained
+  on the TIGER corpus using word embeddings of small dimensionality as input data. The feature-set 
+  is based only on the token itself without context of surrounding words. A maximum F<sub>1</sub> 
+  micro score of 0.919 when tested on the HDT corpus could be achieved.*
+
+------
 
 ### ! Instructions will soon be updated, formatted and translated
 
