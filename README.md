@@ -3,7 +3,7 @@
 ## Single Token Part-of-Speech Tagging using Support Vector Machines and Word Embedding Features
 
 
-w2v-pos-tagger his is a project submission to an NLP & IR class in *2017*. The task description
+**w2v-pos-tagger** is a project submission to an NLP & IR class in *2017*. The task description
 was as follows:
 
 <img align="right" width="480" height="360" src="img/embedding_size_train_size__test_time__f1_micro.png" style="margin:10px" alt="embedding size comparison">
