@@ -2,13 +2,16 @@
 
 ## Single Token Part-of-Speech Tagging using Support Vector Machines and Word Embedding Features
 
+### Introduction
 
 **w2v-pos-tagger** is a project submission to an NLP & IR class in *2017*. The task description
 was as follows:
 
-<img align="right" width="480" height="360" src="img/embedding_size_train_size__test_time__f1_micro.png" style="margin:10px" alt="embedding size comparison">
+<img align="right" width="480" height="360"
+     src="img/embedding_size_train_size__test_time__f1_micro.png" style="margin:10px"
+     alt="embedding size comparison">
 
-<p align=left>
+<p align="left">
 
  * Train a Part-of-speech tagger for the German language.
  * Use the [TIGER corpus](https://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger/)
@@ -47,6 +50,38 @@ language features. The project is described in:
   micro score of 0.919 when tested on the HDT corpus could be achieved.*
 
 </P>
+
+
+### Setup
+
+First set up a Python 3 environment, e.g. via conda:
+
+```bash
+conda create -n w2vpos python=3.* && \
+conda activate w2vpos
+```
+
+Install pip dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Download the required part-of-speech-annotated corpora:
+
+```bash
+mkdir -p corpora && cd corpora
+
+# TIGER
+echo "Please view and accept the license agreement for the TIGER corpus."
+xdg-open https://www.ims.uni-stuttgart.de/documents/ressourcen/korpora/tiger-corpus/license/htmlicense.html
+curl https://www.ims.uni-stuttgart.de/documents/ressourcen/korpora/tiger-corpus/download/tigercorpus-2.2.conll09.tar.gz | tar xvz
+
+# HDT
+curl -SL "https://corpora.uni-hamburg.de:8443/fedora/objects/file:hdt_hdt-conll/datastreams/hdt-conll-tar-xz/content?asOfDateTime=2016-02-17T15:38:47.643Z&download=true" | tar xvfJ -
+```
+
+
 
 ------
 
