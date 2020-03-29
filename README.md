@@ -6,41 +6,47 @@
 w2v-pos-tagger his is a project submission to an NLP & IR class in *2017*. The task description
 was as follows:
 
+<img align="right" width="480" height="360" src="img/embedding_size_train_size__test_time__f1_micro.png" style="margin:10px" alt="embedding size comparison">
+
+<p align=left>
+
  * Train a Part-of-speech tagger for the German language.
- * Use the [TIGER corpus](https://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger/) 
+ * Use the [TIGER corpus](https://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger/)
    as training set.
  * Use the [HDT corpus](https://corpora.uni-hamburg.de/hzsk/de/islandora/object/treebank:hdt)
    as test set.
  * Use the [STTS](http://www.sfs.uni-tuebingen.de/resources/stts-1999.pdf) as well as the
    [Universal tagset](https://universaldependencies.org/u/pos/) as classes.
- * Train a POS-tagger model on an 
+ * Train a POS-tagger model on an
    [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
    using an RBF kernel.
  * Write Precision, Recall and F<sub>1</sub> score metrics.
- * Compare the results to the pre-trained tagger of [spaCy](https://spacy.io/) 1.x and an 
-   [NLTK](https://www.nltk.org/) based tagger trained with the 
+ * Compare the results to the pre-trained tagger of [spaCy](https://spacy.io/) 1.x and an
+   [NLTK](https://www.nltk.org/) based tagger trained with the
    [ClassifierBasedGermanTagger](https://github.com/ptnplanet/NLTK-Contributions).
  * Describe the results in a [course paper](paper/pos_paper_funke.pdf).
- 
-The design for the feature engineering was part of the challenge. I decided for unigram word 
+
+The design for the feature engineering was part of the challenge. I decided for unigram word
 vectors as features for the SVM and applied a comprehensive hyperparameter search for embedding
-types, vector sizes and SVM hyperparameters. This simple, yet effective, approach of learning 
-a hyperplane separation through the embedding space gave an F<sub>1</sub> score of 0.919 for the 
-best models. The approach demonstrates how well static unigram word vectors can represent syntactic 
+types, vector sizes and SVM hyperparameters. This simple, yet effective, approach of learning
+a hyperplane separation through the embedding space gave an F<sub>1</sub> score of 0.919 for the
+best models. The approach demonstrates how well static unigram word vectors can represent syntactic
 language features. The project is described in:
 
 * **A. Funke**: *Single Token Part-of-Speech Tagging using Support Vector Machines and
-  Word Embedding Features*. Course paper for "Natural Language Processing and Information 
+  Word Embedding Features*. Course paper for "Natural Language Processing and Information
   Retrieval" (HHU 2017)  
   [paper/pos_paper_funke.pdf](paper/pos_paper_funke.pdf)
 
   **Abstract:**  
-  *Part-of-speech tagging (POS) is a common technique in Natural Language Processing pipelines. 
-  It enriches a corpus with grammatical information which can be exploited not only for syntactic 
+  *Part-of-speech tagging (POS) is a common technique in Natural Language Processing pipelines.
+  It enriches a corpus with grammatical information which can be exploited not only for syntactic
   but also for semantic evaluation. In this paper we propose an SVM based POS-tagger trained
-  on the TIGER corpus using word embeddings of small dimensionality as input data. The feature-set 
-  is based only on the token itself without context of surrounding words. A maximum F<sub>1</sub> 
+  on the TIGER corpus using word embeddings of small dimensionality as input data. The feature-set
+  is based only on the token itself without context of surrounding words. A maximum F<sub>1</sub>
   micro score of 0.919 when tested on the HDT corpus could be achieved.*
+
+</P>
 
 ------
 
@@ -54,7 +60,7 @@ Die folgenden Programme erwarten, dass im Unterverzeichnis ./corpora/ die Dateie
 bereit gestellt wurden.
 a)
 1.
-Zur Analyse der Tagsets kann das Programm corpora_analyser.py gestartet werden. Sowohl 
+Zur Analyse der Tagsets kann das Programm corpora_analyser.py gestartet werden. Sowohl
 TIGER als auch HDT verwenden ein Tagset, dass dem STTS (54 tags) sehr nahe kommt. Beide Corpora verwendet PROAV statt PAV.  Im TIGER Corpus fehlt PIDAT, dafür findet sich hier NNE als Mischung auf Normal-Nomen (NN) und Eigennamen (NE). Die NNE Tags kann man aber als Überbleibsel betrachten. Im Tiger/Negra-Corpus wird der Tag noch offiziell geführt. Bereits von v2.1 auf v2.2 wurden aber einige entfernt. Die verbliebenen NNE Tags folgen keiner Systematik. Daher habe ich sie als Bugs betrachtet und im folgenden durch NE ersetzt.
 Der HDT Corpus enthält zwei Tagsets. Das STTS nahe Tagset hat ebenfalls kleinere Bugs. Im Folgenden habe ich PPOSSAT zu PPOSAT und VAIZU zu VVIZU korrigiert. Das zweite HDT-Tagset ist eine verkürzte Form des STTS mit folgendem Mapping:
     • ADJD -> ADV
@@ -82,9 +88,9 @@ Wie nach der Übung schon besprochen, könnte man den Code auch leicht umschreib
 Zu guter Letzt wurden noch die Metriken für die Tag-Klassen (ungewichtet) gemittelt. Die Resultate werden auch jeweils in eine csv-Datei geschrieben.
 Die Mittelung müsste eigentlich gewichtet über die Häufigkeit der Tags geschehen, um aussagekräftiger zu sein. Am aussagekräftigsten für einen POS-Tagger finde ich tatsächlich die einfachste Metrik, nämlich die Accuracy. Die anderen Metriken kommen ja eher aus dem Bereich der IR-Systeme, wo sie sicherlich auch Sinn machen. Für einen POS-Tagger finde ich die Unterscheidung zwischen Precision und Recall und das über F1 gemittelte Maß eher wenig hilfreich.
 4.
-Der in 3. beschriebene Prozess erzeugt auch direkt die Evaluierung für das Universal Tagset. Bei dem Mapping habe ich mich an dem von den Autoren des Papers vorgeschlagenen Mapping des TIGER Corpus auf das Universal Tagset orientiert: 
+Der in 3. beschriebene Prozess erzeugt auch direkt die Evaluierung für das Universal Tagset. Bei dem Mapping habe ich mich an dem von den Autoren des Papers vorgeschlagenen Mapping des TIGER Corpus auf das Universal Tagset orientiert:
 https://github.com/slavpetrov/universal-pos-tags/blob/master/de-tiger.map
-NNE wurde wieder heraus genommen und dafür PIDAT hinzu genommen: 
+NNE wurde wieder heraus genommen und dafür PIDAT hinzu genommen:
 https://github.com/slavpetrov/universal-pos-tags/blob/master/de-negra.map
 Die Ergebnisse für das Universal Tagset sind deutlich im Vergleich zum STTS Tagset, was zu erwarten war. Da es weniger Tags gibt (also ein gröberes Clustering) ist auch die Fehleranfälligkeit geringer. Insgesamt annotiert Spacy präziser als NLTK, und ist dabei auch um Größenordnungen schneller.
 b)
@@ -113,6 +119,6 @@ Zum Testen wird svm_tagger_test.py aufgerufen.  Beim Aufruf muss das zu testende
 Beispiel:
 python svm_tagger_test.py --model_file 2017-12-27_15-18-26-774110_custom_sg_50
 Zusätzlich zur Ausgabe der F1 Scores auf der Konsole wird auch eine *_testresult_*.json Datei mit den Ergebnissen gespeichert, die im Anschluss in der Evaluierung ausgewertet werden können. Der Integerwert am Dateinamenende kennzeichnet die verwendete Test-Size, wobei 0 einen Test über den vollen Korpus repräsentiert.
-Die gesammelten Testresultate können für die Evaluierung automatisiert aufbereitet, geplottet und tabellarisch gruppiert und sortiert auf der Konsole ausgegeben werden. Hierzu 
+Die gesammelten Testresultate können für die Evaluierung automatisiert aufbereitet, geplottet und tabellarisch gruppiert und sortiert auf der Konsole ausgegeben werden. Hierzu
 svm_tagger_evaluator.py starten.  Bei Bedarf den Speicherort der testresult-files angeben.
 --model_dir <path to directory of testresult files> (optional)
