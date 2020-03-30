@@ -1,8 +1,8 @@
-gensim
-matplotlib
-nltk
-numpy
-pandas
-sklearn
-spacy
-tabulate
+gensim==3.8.*
+matplotlib==3.2.*
+nltk==3.4.*
+numpy==1.16.*
+pandas==0.24.*
+scikit-learn==0.22.*
+spacy==1.10.*
+tabulate==0.8.*

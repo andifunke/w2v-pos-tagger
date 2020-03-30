@@ -2,7 +2,7 @@
 
 ## Single Token Part-of-Speech Tagging using Support Vector Machines and Word Embedding Features
 
-### Introduction
+### 1 — Introduction
 
 **w2v-pos-tagger** is a project submission to an NLP & IR class in *2017*. The task description
 was as follows:
@@ -29,12 +29,17 @@ was as follows:
    [ClassifierBasedGermanTagger](https://github.com/ptnplanet/NLTK-Contributions).
  * Describe the results in a [course paper](paper/pos_paper_funke.pdf).
 
-The design for the feature engineering was part of the challenge. I decided for unigram word
-vectors as features for the SVM and applied a comprehensive hyperparameter search for embedding
-types, vector sizes and SVM hyperparameters. This simple, yet effective, approach of learning
-a hyperplane separation through the embedding space gave an F<sub>1</sub> score of 0.919 for the
-best models. The approach demonstrates how well static unigram word vectors can represent syntactic
-language features. The project is described in:
+A few choices of the task requirements were questionable, for example the demand of an SVM
+classifier and the mandatory usage for a nonlinear kernel, also the requirement for different 
+train/test corpora and the size of the test set itself (full corpus). However, this project stays
+within the bounds of these constrains.
+
+Defining a design for the feature engineering was part of the challenge. I decided for unigram word
+vectors as input features for the SVM and applied a comprehensive hyperparameter search for 
+embedding types, vector sizes and SVM hyperparameters. This simple, yet effective, approach of 
+learning a hyperplane separation through the (RBF-transformed) embedding space gave an 
+F<sub>1</sub> score of 0.919 for the best models. The approach demonstrates how well static unigram
+word vectors can represent syntactic language features. The project is described in:
 
 * **A. Funke**: *Single Token Part-of-Speech Tagging using Support Vector Machines and
   Word Embedding Features*. Course paper for "Natural Language Processing and Information
@@ -51,59 +56,51 @@ language features. The project is described in:
 
 </P>
 
+### 2 — Setup
 
-### Setup
-
-First set up a Python 3 environment, e.g. via conda:
+At first, set up a Python 3 environment, e.g. via conda:
 
 ```bash
-conda create -n w2vpos python=3.* && \
+conda create -n w2vpos python=3.6.*
 conda activate w2vpos
 ```
 
-Install pip dependencies:
+Install pip dependencies and the German spaCy model:
 
 ```bash
 pip install -r requirements.txt
+python -m spacy download de
 ```
 
-Download the required part-of-speech-annotated corpora:
+Download the required part-of-speech annotated corpora:
 
 ```bash
-mkdir -p corpora && cd corpora
+mkdir -p corpora
 
 # TIGER
 echo "Please view and accept the license agreement for the TIGER corpus."
 xdg-open https://www.ims.uni-stuttgart.de/documents/ressourcen/korpora/tiger-corpus/license/htmlicense.html
-curl https://www.ims.uni-stuttgart.de/documents/ressourcen/korpora/tiger-corpus/download/tigercorpus-2.2.conll09.tar.gz | tar xvz
+curl https://www.ims.uni-stuttgart.de/documents/ressourcen/korpora/tiger-corpus/download/tigercorpus-2.2.conll09.tar.gz | tar xvz -C corpora
 
 # HDT
-curl -SL "https://corpora.uni-hamburg.de:8443/fedora/objects/file:hdt_hdt-conll/datastreams/hdt-conll-tar-xz/content?asOfDateTime=2016-02-17T15:38:47.643Z&download=true" | tar xvfJ -
+curl -SL "https://corpora.uni-hamburg.de:8443/fedora/objects/file:hdt_hdt-conll/datastreams/hdt-conll-tar-xz/content?asOfDateTime=2016-02-17T15:38:47.643Z&download=true" | tar xvfJ - -C corpora
 ```
 
+### 3 — Documentation
 
+### ! will be updated soon !
 
-------
-
-### ! Instructions will soon be updated, formatted and translated
-
-Die folgenden Programme erwarten, dass im Unterverzeichnis ./corpora/ die Dateien
-    • tiger_release_aug07.corrected.16012013.conll09
-    • part_A.conll
-    • part_B.conll
-    • part_C.conll
-bereit gestellt wurden.
-a)
+<!--
 1.
 Zur Analyse der Tagsets kann das Programm corpora_analyser.py gestartet werden. Sowohl
 TIGER als auch HDT verwenden ein Tagset, dass dem STTS (54 tags) sehr nahe kommt. Beide Corpora verwendet PROAV statt PAV.  Im TIGER Corpus fehlt PIDAT, dafür findet sich hier NNE als Mischung auf Normal-Nomen (NN) und Eigennamen (NE). Die NNE Tags kann man aber als Überbleibsel betrachten. Im Tiger/Negra-Corpus wird der Tag noch offiziell geführt. Bereits von v2.1 auf v2.2 wurden aber einige entfernt. Die verbliebenen NNE Tags folgen keiner Systematik. Daher habe ich sie als Bugs betrachtet und im folgenden durch NE ersetzt.
 Der HDT Corpus enthält zwei Tagsets. Das STTS nahe Tagset hat ebenfalls kleinere Bugs. Im Folgenden habe ich PPOSSAT zu PPOSAT und VAIZU zu VVIZU korrigiert. Das zweite HDT-Tagset ist eine verkürzte Form des STTS mit folgendem Mapping:
-    • ADJD -> ADV
-    • PDAT, PIAT, PIDAT, PWAT, PPOSAT, PRELAT -> ART
-    • NE, NN -> N
-    • APPO, APPR, APPRART -> PREP
-    • PWS, PRF, PRELS, PPER, PIS, PDS, PPOSS -> PRO
-    • VVIZU, VAFIN, VAIMP, VAINF, VAPP, VMFIN, VMINF, VMPP, VVFIN, VVIMP, VVINF, VVPP -> V
+    • ADJD → ADV
+    • PDAT, PIAT, PIDAT, PWAT, PPOSAT, PRELAT → ART
+    • NE, NN → N
+    • APPO, APPR, APPRART → PREP
+    • PWS, PRF, PRELS, PPER, PIS, PDS, PPOSS → PRO
+    • VVIZU, VAFIN, VAIMP, VAINF, VAPP, VMFIN, VMINF, VMPP, VVFIN, VVIMP, VVINF, VVPP → V
 Mir ist nicht bekannt, ob dieses Tagset einen eigenen Namen hat. Auf der Webseite des Hamburg Dependency Treesets findet man dazu keine Informationen.
 
 Quellen:
@@ -157,3 +154,4 @@ Zusätzlich zur Ausgabe der F1 Scores auf der Konsole wird auch eine *_testresul
 Die gesammelten Testresultate können für die Evaluierung automatisiert aufbereitet, geplottet und tabellarisch gruppiert und sortiert auf der Konsole ausgegeben werden. Hierzu
 svm_tagger_evaluator.py starten.  Bei Bedarf den Speicherort der testresult-files angeben.
 --model_dir <path to directory of testresult files> (optional)
+//-->
