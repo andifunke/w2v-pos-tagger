@@ -1,20 +1,33 @@
-from data_loader import *
+"""
+Analyses the used tagsets from the TIGER and HDT corpora.
+
+Additionally provides a mapping for the reduced HDT tagset.
+"""
+
+import pandas as pd
+
+from data_loader import TOKN_ID, STTS, STTS_DEFAULT, get_original_corpus, TIGER, tprint, HDT, REDU
 
 
 def get_tagset(df, columns):
-    print('getting tagset from corpus')
+    """Returns the tagset of a given corpus as dict."""
 
+    print('getting tagset from corpus')
     df_count = df.groupby(columns).count()
     return {k: v[TOKN_ID] for k, v in df_count.iterrows()}
 
 
 def compare_to_stts(corpus, df, tagset_key=STTS):
+    """Compare the tagset of a corpus to the default STTS tagset. Print the results."""
+
     corp = corpus
-    tagset = set(filter(lambda x: x not in REMOVAL, df[tagset_key].unique()))
+    tagset = set(filter(lambda x: x not in {'_', ''}, df[tagset_key].unique()))
     print("\n{}/{} tagset:\n{}".format(corp, tagset_key, sorted(tagset)))
     print("length:", len(tagset))
     print("{}/{} tags missing in STTS: {}".format(corp, tagset_key, sorted(tagset - STTS_DEFAULT)))
-    print("STTS tags missing in {}/{}: {}\n".format(corp, tagset_key, sorted(STTS_DEFAULT - tagset)))
+    print(
+        "STTS tags missing in {}/{}: {}\n".format(corp, tagset_key, sorted(STTS_DEFAULT - tagset))
+    )
 
 
 def main():
@@ -47,6 +60,4 @@ def main():
 
 
 if __name__ == '__main__':
-    REMOVAL = {'_', ''}
-
     main()

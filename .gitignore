@@ -147,3 +147,4 @@ corpora
 Classifier*
 external
 *.bak
+tmp/
