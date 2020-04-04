@@ -1,9 +1,13 @@
-import re
+#!/usr/bin/env python3
+
 import json
-from data_loader import *
+import re
 from os import listdir
-from svm_tagger_train import get_options
+
 import matplotlib.pyplot as plt
+
+from data_loader import *
+from svm_tagger_train import get_options
 
 # making stuff more human readable
 AXES = {
@@ -144,7 +148,7 @@ def svm_evaluator_main(directory=None):
     a given directory overwrites the defaults. The function will look for all test-result files in this directory.
     """
     print('start evaluating')
-    dir_name = DATA_DIR if directory is None else directory
+    dir_name = CORPORA_DIR if directory is None else directory
     files = [f for f in listdir(dir_name) if re.match(r'.*_testresults_.*\.json$', f)]
 
     # loading test-results

@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+
 import sys
-from data_loader import *
+
 from corpora_analyser import get_tagset
+from data_loader import *
 
 
 def concat_df(selftagged, reference):

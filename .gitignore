@@ -148,3 +148,4 @@ Classifier*
 external
 *.bak
 tmp/
+ClassifierBasedGermanTagger

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Analyses the used tagsets from the TIGER and HDT corpora.
 

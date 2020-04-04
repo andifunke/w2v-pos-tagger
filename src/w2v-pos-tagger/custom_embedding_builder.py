@@ -1,5 +1,8 @@
-from data_loader import *
+#!/usr/bin/env python3
+
 import gensim.models.word2vec as wv
+
+from data_loader import *
 
 
 def sentences_from_corpus(corpus, lowercase=False):
@@ -43,7 +46,7 @@ def custom_embedding_builder_main():
                                         cbow_mean=1, iter=5, null_word=0, trim_rule=None, sorted_vocab=1,
                                         batch_words=10000, compute_loss=False)
 
-                    fname = path.join(DATA_DIR, 'custom_embedding_{}_{:d}{}_xyz.test'.format(mdl, size, lc))
+                    fname = path.join(CORPORA_DIR, 'custom_embedding_{}_{:d}{}_xyz.test'.format(mdl, size, lc))
                     print("saving vectors to {}".format(fname))
                     model.save(fname)
 

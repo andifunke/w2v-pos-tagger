@@ -1,59 +1,91 @@
-import nltk
-import random
-import pickle
-from os import path
-from data_loader import DATA_DIR, OUT_DIR
-from ClassifierBasedGermanTagger import ClassifierBasedGermanTagger
+#!/usr/bin/env python3
 
 """
-    based on this tutorial:
-    https://datascience.blog.wzb.eu/2016/07/13/accurate-part-of-speech-tagging-of-german-texts-with-nltk/
+The training script is based on this tutorial:
+https://datascience.blog.wzb.eu/2016/07/13/accurate-part-of-speech-tagging-of-german-texts-with-nltk/
 """
+
+import argparse
+import pickle
+import random
+
+import nltk
+
+from ClassifierBasedGermanTagger import ClassifierBasedGermanTagger
+from data_loader import TIGER_DIR, OUT_DIR
 
 
 def read_corpus():
-    print('reading TIGER corpus')
-    return nltk.corpus.ConllCorpusReader(DATA_DIR,
-                                         'tiger_release_aug07.corrected.16012013.conll09',
-                                         ['ignore', 'words', 'ignore', 'ignore', 'pos'],
-                                         encoding='utf-8')
+    """Reads the TIGER corpus as an NLTK conll corpus."""
+
+    print('Reading TIGER corpus')
+
+    return nltk.corpus.ConllCorpusReader(
+        root=TIGER_DIR.as_posix(),
+        fileids='tiger_release_aug07.corrected.16012013.conll09',
+        columntypes=['ignore', 'words', 'ignore', 'ignore', 'pos'],
+        encoding='utf-8'
+    )
 
 
 def train_tagger(corpus, evaluate=False):
+    """Trains an NLTK based POS-tagger and evaluates the model on a test set."""
+
     tagged_sents = corpus.tagged_sents()
 
-    # marginal accuracy-boost from 0.9417 -> 0.9423 in evaluate mode
-    # therefore I skip the suggested shuffeling, especially in full mode
-    if evaluate and False:
+    if evaluate:
         tagged_sents = [sentence for sentence in tagged_sents]
         random.shuffle(tagged_sents)
-
-    if evaluate:
-        # set a split size: use 90% for training, 10% for testing
-        split_perc = 0.1
-        split_size = int(len(tagged_sents) * split_perc)
+        # set a split ratio: 90% for training, 10% for testing
+        test_fraction = 0.1
+        split_size = int(len(tagged_sents) * test_fraction)
     else:
         # use the full corpus in non-evaluate (i.e. full) mode
         split_size = 0
 
     train_sents, test_sents = tagged_sents[split_size:], tagged_sents[:split_size]
 
-    print('training POS tagger on corpus')
+    print('Training POS tagger on TIGER corpus')
     tagger = ClassifierBasedGermanTagger(train=train_sents)
 
     if evaluate:
-        print('accuracy:', tagger.evaluate(test_sents))
+        print('Evaluating POS tagger')
+        accuracy = tagger.evaluate(test_sents)
+        print(f'Accuracy: {accuracy:0.3f}')
 
     return tagger
 
 
+def parse_args() -> argparse.Namespace:
+    """
+    Parses module-specific arguments.
+
+    :returns: arguments object
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--evaluate', action='store_true', required=False,
+        help='Evaluate the model after training.'
+    )
+    parser.set_defaults(evaluate=False)
+    args = parser.parse_args()
+    
+    return args
+
+
+def main():
+    args = parse_args() 
+    evaluate = args.evaluate
+
+    corpus = read_corpus()
+    tagger = train_tagger(corpus, evaluate=evaluate)
+
+    model_path = OUT_DIR / f'nltk_german_classifier_data.pickle'
+    print('Saving POS tagger to', model_path)
+    with open(model_path, 'wb') as fp:
+        pickle.dump(tagger, fp, protocol=2)
+
+
 if __name__ == '__main__':
-    evaluate = False
-
-    corp = read_corpus()
-    taggr = train_tagger(corp, evaluate=evaluate)
-
-    print('saving tagger')
-    suffix = '' if evaluate else '_full'
-    with open(path.join(OUT_DIR, 'nltk_german_classifier_data{}.pickle'.format(suffix)), 'wb') as f:
-        pickle.dump(taggr, f, protocol=2)
+    main()

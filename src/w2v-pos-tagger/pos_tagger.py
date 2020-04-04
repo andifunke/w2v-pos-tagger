@@ -1,8 +1,12 @@
-from data_loader import *
-import spacy
-import nltk
+#!/usr/bin/env python3
+
 import pickle
 import sys
+
+import nltk
+import spacy
+
+from data_loader import *
 
 
 def run_tagger(corpus_name, corpus_df, nlp_framework, dry_run=True):
@@ -70,7 +74,7 @@ if __name__ == '__main__':
 
     print('loading', NLTK)
     nltk.data.load('tokenizers/punkt/german.pickle')
-    with open(path.join(DATA_DIR, 'nltk_german_classifier_data_full.pickle'), 'rb') as f:
+    with open(path.join(CORPORA_DIR, 'nltk_german_classifier_data_full.pickle'), 'rb') as f:
         NLTK_TAGGER = pickle.load(f)
 
     main()

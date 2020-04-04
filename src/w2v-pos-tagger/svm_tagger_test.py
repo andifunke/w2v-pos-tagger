@@ -1,14 +1,17 @@
+#!/usr/bin/env python3
+
 """
-in parts inspired by http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#sphx-glr-auto-examples-text-document-classification-20newsgroups-py
+In parts inspired by
+http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#sphx-glr-auto-examples-text-document-classification-20newsgroups-py
 """
-import re
+
 import json
+import re
+from os import listdir
+
 from sklearn.metrics import f1_score
 
 from data_loader import *
-from os import listdir
-
-
 # argument parsing and setting default values
 from svm_tagger_train import get_xy, get_options
 
@@ -18,7 +21,7 @@ def test_main(directory=None, file=None):
     print('start testing')
     t0 = time()
 
-    dir_name = DATA_DIR if directory is None else directory
+    dir_name = CORPORA_DIR if directory is None else directory
     file_name = OPTIONS['model_file'] if file is None else file
     files = [f for f in listdir(dir_name) if re.match(file_name, f)]
 

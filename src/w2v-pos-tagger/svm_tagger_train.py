@@ -1,6 +1,10 @@
+#!/usr/bin/env python3
+
 """
-in parts inspired by http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#sphx-glr-auto-examples-text-document-classification-20newsgroups-py
+In parts inspired by
+http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#sphx-glr-auto-examples-text-document-classification-20newsgroups-py
 """
+
 import argparse
 import json
 from datetime import datetime
@@ -8,7 +12,6 @@ from datetime import datetime
 import numpy as np
 import six.moves.cPickle as cPickle
 from sklearn import svm, preprocessing
-from sklearn.feature_extraction import DictVectorizer
 
 from data_loader import *
 
@@ -60,7 +63,7 @@ def get_options():
                         choices=['cb', 'sg'])
     parser.add_argument('--clf_file', default='', type=str)
     parser.add_argument('--model_file', default='', type=str)
-    parser.add_argument('--model_dir', default=DATA_DIR, type=str)
+    parser.add_argument('--model_dir', default=CORPORA_DIR, type=str)
 
     return vars(parser.parse_args())
 
@@ -71,7 +74,7 @@ def get_xy(corpus, size=0, embedding_size=12, embedding_model='sg', lowercase=Fa
 
     # gensim cannot be used on hpc
     lc = '_lc' if lowercase else ''
-    fname = path.join(DATA_DIR, 'custom_embedding_{}_{:d}{}.vec'.format(embedding_model, embedding_size, lc))
+    fname = path.join(CORPORA_DIR, 'custom_embedding_{}_{:d}{}.vec'.format(embedding_model, embedding_size, lc))
     if 'OPTIONS' in globals() and OPTIONS['gensim']:
         import gensim.models.word2vec as wv
         model = wv.Word2Vec.load(fname)
@@ -123,7 +126,7 @@ def train_main():
         scaler = preprocessing.MinMaxScaler()
         scaler.fit(X)
         X = scaler.transform(X)
-        scale_fname = path.join(DATA_DIR, train_fname + '_scale.pickle')
+        scale_fname = path.join(CORPORA_DIR, train_fname + '_scale.pickle')
         print('saving scaler to', scale_fname)
         with open(scale_fname, 'wb') as f:
             cPickle.dump(scaler, f)
@@ -139,13 +142,13 @@ def train_main():
     print('fitting...')
     clf.fit(X, y)
 
-    clf_fname = path.join(DATA_DIR, train_fname + '_clf.pickle')
+    clf_fname = path.join(CORPORA_DIR, train_fname + '_clf.pickle')
     print('\nsaving clf to', clf_fname)
     with open(clf_fname, 'wb') as f:
         cPickle.dump(clf, f)
 
     OPTIONS['time_train'] = time() - t0
-    options_fname = path.join(DATA_DIR, train_fname + '_options.json')
+    options_fname = path.join(CORPORA_DIR, train_fname + '_options.json')
     print('saving options to', options_fname)
     with open(options_fname, 'w') as f:
         json.dump(OPTIONS, f)

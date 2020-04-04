@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Provides functions to load and normalize the corpora.
 
@@ -11,7 +13,6 @@ from time import time
 
 import pandas as pd
 from tabulate import tabulate
-
 
 # --- constants ---
 SPACY = 'SPACY'
@@ -52,9 +53,9 @@ F1 = 'F1'
 KEYS = {
     TIGER: [
         TOKN_ID, FORM, LEMM, 'PLEMMA', STTS, 'PPOS', 'FEAT', 'PFEAT', 'HEAD', 'PHEAD', 'DEPREL',
-        'PDEPREL', 'FILLPRED', 'PRED', 'APREDs'
+        'PDEPREL', 'FILLPRED', 'PRED', 'APREDS'
     ],
-    HDT: [TOKN_ID, FORM, LEMM, REDU, STTS, 'FEAT', 'HEAD', 'DEPREL', 'UNKOWN_1', 'UNKNOWN_2'],
+    HDT: [TOKN_ID, FORM, LEMM, REDU, STTS, 'FEAT', 'HEAD', 'DEPREL', 'UNKNOWN_1', 'UNKNOWN_2'],
     MINIMAL: [TOKN_ID, FORM, LEMM, STTS],
     DEFAULT: [CORP, SENT_ID, TOKN_ID, FORM, LEMM, STTS, UNIV],
     SPACY: [ID, FORM, LEMM, 'POS', STTS, 'DEP', 'SHAPE', 'ALPHA', 'STOP'],
@@ -156,10 +157,10 @@ STTS_UNI_MAP_EXTENDED.update({'NNE': 'NOUN', 'PPOSSAT': 'PRON', 'VAIZU': 'VERB'}
 PACKAGE_DIR = Path(__file__).resolve().parent
 SRC_DIR = PACKAGE_DIR.parent
 PROJECT_DIR = SRC_DIR.parent
-DATA_DIR = PROJECT_DIR / 'corpora'
-OUT_DIR = DATA_DIR / 'out'
-TIGER_DIR = DATA_DIR / 'tiger-conll'
-HDT_DIR = DATA_DIR / 'hamburg-dependency-treebank-conll'
+CORPORA_DIR = PROJECT_DIR / 'corpora'
+OUT_DIR = CORPORA_DIR / 'out'
+TIGER_DIR = CORPORA_DIR / 'tiger-conll'
+HDT_DIR = CORPORA_DIR / 'hamburg-dependency-treebank-conll'
 
 # corpora file names
 FILES = {
@@ -201,10 +202,10 @@ def read_raw(file, keys, converters=None, raw=False):
     """
 
     if raw:
-        usecols = None
+        use_cols = None
         dtype = None
     else:
-        usecols = KEYS[MINIMAL]
+        use_cols = KEYS[MINIMAL]
         if converters is not None and TOKN_ID in converters:
             dtype = None
         else:
@@ -212,7 +213,7 @@ def read_raw(file, keys, converters=None, raw=False):
     sbl = True
 
     df = pd.read_csv(
-        file, sep="\t", names=keys, header=None, usecols=usecols, dtype=dtype,
+        file, sep="\t", names=keys, header=None, usecols=use_cols, dtype=dtype,
         skip_blank_lines=sbl, quotechar='\x07', converters=converters, na_filter=False
     )
 

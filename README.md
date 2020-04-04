@@ -90,14 +90,34 @@ curl -SL "https://corpora.uni-hamburg.de:8443/fedora/objects/file:hdt_hdt-conll/
 
 #### 3.1 Corpus Analysis & Normalization
 
-Run `python src/w2v-pos-tagger/corpora_analyser.py` to analyse the tagset of both corpora.
+To analyse the tagset of both corpora, run
+
+```bash
+python src/w2v-pos-tagger/corpora_analyser.py
+```
 
 To normalize and fix a few issues in the corpora and to persist the results run
-`python src/w2v-pos-tagger/data_loader.py`. This will cache the pre-processing to csv files
+
+```bash
+python src/w2v-pos-tagger/data_loader.py
+```
+
+This will cache the pre-processing to csv files
 in `./corpora/out`.
 
 
 
-#### 3.2 ...
+#### 3.2 spaCy and NLTK tagging
 
-... coming soon ...
+Before training our own SVM model we will evaluate the POS-tagging efficiency of common
+NLP frameworks such as `spaCy` and `NLTK`. In order to provide a comparable NLTK based
+tagger we will train it first. This requires to clone an additional repository from github.
+
+```bash
+git clone git@github.com:ptnplanet/NLTK-Contributions.git lib/NLTK-Contributions
+cp lib/NLTK-Contributions/ClassifierBasedGermanTagger/ClassifierBasedGermanTagger.py src/w2v-pos-tagger/
+
+python src/w2v-pos-tagger/nltk_tiger_trainer.py --evaluate
+```
+
+The newly trained NLTK tagger will be saved to `./corpora/out/nltk_german_classifier_data.pickle`.
