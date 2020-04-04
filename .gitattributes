@@ -1,1 +1,3 @@
 *.tex linguist-detectable=false
+*.pdf linguist-detectable=false
+*.js linguist-detectable=true
