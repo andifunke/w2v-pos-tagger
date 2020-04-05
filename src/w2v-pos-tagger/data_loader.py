@@ -241,7 +241,7 @@ def read_raw(file, keys, converters=None, raw=False):
 
 def get_preprocessed_corpus(corpus):
     assert corpus in {TIGER, HDT}
-    print('reading preprocessed {} corpus'.format(corpus))
+    print('Reading preprocessed {} corpus'.format(corpus))
     return pd.read_csv(
         FILES[PREPROCESSED](corpus), sep="\t", dtype={TOKN_ID: int, SENT_ID: int}, na_filter=False
     )
@@ -250,7 +250,7 @@ def get_preprocessed_corpus(corpus):
 def get_original_corpus(corpus, show_sample=0, raw=False):
     assert corpus in {TIGER, HDT}
 
-    print('reading original {} corpus'.format(corpus))
+    print('Reading original {} corpus'.format(corpus))
     # read to pandas DataFrame
     global CURRENT_SENTENCE_ID
     global LAST_TOKEN_ID

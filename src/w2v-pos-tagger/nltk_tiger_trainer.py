@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 """
+Trains a German part-of-speech tagger on the TIGER corpus by using the ClassifierBasedGermanTagger.
+(https://github.com/ptnplanet/NLTK-Contributions/tree/master/ClassifierBasedGermanTagger)
+
 The training script is based on this tutorial:
 https://datascience.blog.wzb.eu/2016/07/13/accurate-part-of-speech-tagging-of-german-texts-with-nltk/
 """

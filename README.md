@@ -121,3 +121,9 @@ python src/w2v-pos-tagger/nltk_tiger_trainer.py --evaluate
 ```
 
 The newly trained NLTK tagger will be saved to `./corpora/out/nltk_german_classifier_data.pickle`.
+
+To evaluate the spaCy and NLTK part-of-speech tagger run
+
+```bash
+python src/w2v-pos-tagger/baseline_pos_tagger.py
+```
