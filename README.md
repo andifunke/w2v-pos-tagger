@@ -127,3 +127,23 @@ To evaluate the spaCy and NLTK part-of-speech tagger run
 ```bash
 python src/w2v-pos-tagger/baseline_pos_tagger.py
 ```
+
+
+#### 3.3 Evaluation
+
+```bash
+python src/w2v-pos-tagger/pos_tagger_evaluator.py
+```
+
+will measure the performance of the newly tagged corpora against the ground truth
+on several related metrics:
+
+* accuracy
+* precision
+* recall
+* F<sub>1</sub> measure
+
+The script expects that the `baseline_pos_tagger.py` has already been run.
+
+
+

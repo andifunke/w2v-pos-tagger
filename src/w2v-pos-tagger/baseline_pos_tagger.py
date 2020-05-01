@@ -12,9 +12,9 @@ from time import time
 import spacy
 from tqdm import tqdm
 
-from data_loader import (
-    OUT_DIR, SPACY, NLTK, TIGER, HDT, get_preprocessed_corpus, STTS_UNI_MAP_EXTENDED,
-    CORP, SENT_ID, TOKN_ID, FORM, STTS, UNIV
+from data_loader import OUT_DIR, get_preprocessed_corpus
+from constants import (
+    SPACY, NLTK, TIGER, HDT, SENT_ID, TOKN_ID, FORM, STTS, UNIV, CORP, STTS_UNI_MAP_EXTENDED
 )
 
 

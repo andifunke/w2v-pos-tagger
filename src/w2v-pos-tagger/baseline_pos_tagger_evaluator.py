@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-import os
 
-from constants import SELF_TXT, SELF_TAG, GOLD_TXT, \
-    GOLD_TAG, TP, TN, FP, FN, PREC, RECL, F1, STTS_TAGS, UNIV_TAGS
-from corpora_analyser import get_tagset
-from data_loader import *
+from time import time
+
+import pandas as pd
+
+from data_loader import (
+    tprint, OUT_DIR, get_preprocessed_corpus, get_selftagged_corpus)
+from constants import SPACY, NLTK, TIGER, HDT, FORM, SELF_TXT, SELF_TAG, GOLD_TXT, GOLD_TAG, TP, \
+    FP, FN, PREC, RECL, F1, STTS, UNIV
 
 
 def concat_df(selftagged, reference):
@@ -44,6 +47,15 @@ def evaluate(df):
     classes = pd.DataFrame(columns=metrics, index=sorted(TAGSET_TAGS))
     classes.fillna(0.0, inplace=True)
 
+    # slow! probably due to iterrows() and testing term-equality...
+    # try: Simply converting from the pandas representation to a NumPy representation via the
+    # [careful: Series].values field yields an almost full order of magnitude performance improvement in
+    # the sum function.
+    #
+    # OR: try groupby SELF_TAG, GOLD_TAG + count,
+    # maybe apply a filter (== as well as !=) to aggregate TP, FP and FN
+    # example: titanic.groupby('class')['survived'].count()
+    # timeit
     for index, row in df.iterrows():
         self_txt = row[SELF_TXT]
         self_tag = row[SELF_TAG]
@@ -83,63 +95,41 @@ def evaluate(df):
     return classes
 
 
-def run_evaluation_for(corpus, framework, analyse=True):
-    sample_size = 0
-    df_self = get_selftagged_corpus(corpus, framework, show_sample=sample_size)
-    df_gold = TO_DF if corpus == TIGER else HO_DF
-
-    if analyse:
-        analyse_tagset(df_self, corpus, framework)
-        return
-
-    combined = concat_df(df_self, df_gold)
-
-    print(">>> evaluating Accuracy, Precision, Recall and F_1 measure for {}/{}.\n"
-          "This may take a while!".format(corpus, framework))
+def run_evaluation_for(gold, pred, tagset):
+    combined = concat_df(gold, pred)
 
     # TODO: HDT enthält PIDAT, das nicht in der Tiger-Trainingsmenge vorkommt
     # TODO: und daher nicht von NLTK gelernt werden konnte. Am nächsten verwandt: PIAT => ersetzen
     results = evaluate(combined)
-    tprint(results)
-    results.to_csv(os.path.join(OUT_DIR, '{}_{}_{}_results.csv'.format(corpus, framework, TAGSET)), sep='\t')
+    return results
 
 
-def analyse_tagset(df, corpus, framework):
-    print(">>> analysing given tagsets")
-
-    tagset = get_tagset(df, TAGSET)
-    print('{} {} tagset:\n'.format(corpus, framework), sorted(tagset.keys()), '\nlength:', len(tagset))
-
-
-def tag_evaluator_main():
+def main():
     """
     Evaluates the tagging with several metrics. Each corpus for each framework.
     STTS and Universal tagsets can be evaluated.
     """
 
-    print(">>> start evaluating tagged corpora on tagset", TAGSET)
     t0 = time()
 
-    # could be more efficient if SPACY and NLTK would be processed at the same time
-    # instead of one after the other, but this makes the code clearer.
-    # Same goes for STTS vs. Universal tagsets
-    run_evaluation_for(TIGER, SPACY)
-    run_evaluation_for(TIGER, NLTK)
-    run_evaluation_for(HDT, SPACY)
-    run_evaluation_for(HDT, NLTK)
-    print("done in {:f}s".format(time() - t0))
+    for corpus in [TIGER, HDT]:
+        # --- load ground truth ---
+        gold = get_preprocessed_corpus(corpus)
+
+        for framework in [SPACY, NLTK]:
+            # --- load predictions ---
+            pred = get_selftagged_corpus(corpus, framework)
+
+            print(">>> Evaluating Accuracy, Precision, Recall and F_1 measure for {}/{}."
+                  "This may take a while!".format(corpus, framework))
+            results = run_evaluation_for(gold, pred, STTS)
+            tprint(results)
+            results.to_csv(
+                OUT_DIR / f'{corpus}_{framework}_{tagset}_results_new.csv', sep='\t'
+            )
+
+    print(f"Done in {time() - t0:f}s")
 
 
 if __name__ == '__main__':
-    # --- load ground truth ---
-    TO_DF = get_preprocessed_corpus(TIGER)
-    HO_DF = get_preprocessed_corpus(HDT)
-
-    # Evaluate for both STTS and Universal tagsets by default.
-    TAGSET = STTS
-    TAGSET_TAGS = STTS_TAGS
-    tag_evaluator_main()
-
-    TAGSET = UNIV
-    TAGSET_TAGS = UNIV_TAGS.keys()
-    tag_evaluator_main()
+    main()
