@@ -81,8 +81,8 @@ def read_raw(file, keys, converters=None, raw=False):
 
         df[UNIV] = df.apply(lambda row: add_univ(row[STTS]), axis=1)
         df[LEMM] = df.apply(lambda row: conv_lemm(row[FORM], row[LEMM]), axis=1)
-        sent_split = df[TOKN_ID] <= df[TOKN_ID].shift()
-        df[SENT_ID] = sent_split.cumsum() + 1
+        sent_split = df[TOKN_ID] <= df[TOKN_ID].shift(fill_value=1)
+        df[SENT_ID] = sent_split.cumsum()
 
     return df
 
