@@ -58,17 +58,16 @@ word vectors can represent syntactic language features. The project is described
 
 ### 2 — Setup
 
-At first, set up a Python 3 environment, e.g. via conda:
+At first, set up a conda environment:
 
 ```bash
-conda create -n w2vpos python=3.6.*
+conda env create -f environment.yml
 conda activate w2vpos
 ```
 
-Install pip dependencies and the German spaCy model:
+Install the German spaCy model:
 
 ```bash
-pip install -r requirements.txt
 python -m spacy download de
 ```
 

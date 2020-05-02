@@ -36,9 +36,6 @@ FILES = {
     SELFTAGGED: lambda corpus, framework: OUT_DIR / f'{corpus}_pos_by_{framework}.csv'
 }
 
-CURRENT_SENTENCE_ID = 1
-LAST_TOKEN_ID = 0
-
 
 def conv_tags(tag):
     """Replaces wrong tags in a corpus."""
@@ -69,22 +66,13 @@ def read_raw(file, keys, converters=None, raw=False):
             dtype = None
         else:
             dtype = {TOKN_ID: int}
-    sbl = True
 
     df = pd.read_csv(
         file, sep="\t", names=keys, header=None, usecols=use_cols, dtype=dtype,
-        skip_blank_lines=sbl, quotechar='\x07', converters=converters, na_filter=False
+        skip_blank_lines=True, quotechar='\x07', converters=converters, na_filter=False,
     )
 
     if not raw:
-        def add_sent_id(token_id):
-            global CURRENT_SENTENCE_ID
-            global LAST_TOKEN_ID
-            if token_id <= LAST_TOKEN_ID:
-                CURRENT_SENTENCE_ID += 1
-            LAST_TOKEN_ID = token_id
-            return CURRENT_SENTENCE_ID
-
         def add_univ(stts):
             return STTS_UNI_MAP[stts]
 
@@ -93,7 +81,8 @@ def read_raw(file, keys, converters=None, raw=False):
 
         df[UNIV] = df.apply(lambda row: add_univ(row[STTS]), axis=1)
         df[LEMM] = df.apply(lambda row: conv_lemm(row[FORM], row[LEMM]), axis=1)
-        df[SENT_ID] = df.apply(lambda row: add_sent_id(row[TOKN_ID]), axis=1)
+        sent_split = df[TOKN_ID] <= df[TOKN_ID].shift()
+        df[SENT_ID] = sent_split.cumsum() + 1
 
     return df
 
@@ -115,12 +104,7 @@ CONVERTERS = {
 
 
 def get_original_corpus(corpus, show_sample=0, raw=False):
-    assert corpus in {TIGER, HDT}
-
-    global CURRENT_SENTENCE_ID
-    global LAST_TOKEN_ID
-    CURRENT_SENTENCE_ID = 1
-    LAST_TOKEN_ID = 0
+    assert corpus in {TIGER, HDT}, f'{corpus} is an unknown corpus.'
 
     print(f'Reading original {corpus} corpus')
     df = pd.concat([
@@ -137,8 +121,8 @@ def get_original_corpus(corpus, show_sample=0, raw=False):
 
 
 def get_selftagged_corpus(corpus=TIGER, framework=SPACY, show_sample=0):
-    assert corpus in {TIGER, HDT}
-    assert framework in {SPACY, NLTK}
+    assert corpus in {TIGER, HDT}, f'{corpus} is an unknown corpus.'
+    assert framework in {SPACY, NLTK}, f'{framework} is an unknown framework.'
 
     print(f'Reading {corpus} corpus, annotated with {framework}')
     df = pd.read_csv(
@@ -169,10 +153,9 @@ def main():
 
     OUT_DIR.mkdir(exist_ok=True)
 
-    process_corpora = [TIGER, HDT]
-    for corpus in process_corpora:
+    for corpus in [TIGER, HDT]:
         t0 = time()
-        df = get_original_corpus(corpus, show_sample=-50)
+        df = get_original_corpus(corpus, show_sample=50)
         df.to_csv(FILES[PREPROCESSED](corpus), sep='\t', index=False)
         print(f"{corpus} done in {time() - t0:.2f}s")
 
