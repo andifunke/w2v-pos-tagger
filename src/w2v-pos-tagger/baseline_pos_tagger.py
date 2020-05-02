@@ -97,7 +97,7 @@ def main():
             # --- save results ---
             file_path = OUT_DIR / f'{name}_pos_by_{framework}.csv'
             print(f'Writing {file_path}')
-            df.to_csv(file_path, header=False, index=False, sep='\t', quoting=csv.QUOTE_NONE)
+            df.to_csv(file_path, index=False, sep='\t', quoting=csv.QUOTE_NONE)
 
 
 if __name__ == '__main__':

@@ -83,7 +83,7 @@ def evaluate(df):
     return classes
 
 
-def run_evaluation_for(corpus, framework, analyse=True):
+def run_evaluation_for(corpus, framework, analyse=False):
     sample_size = 0
     df_self = get_selftagged_corpus(corpus, framework, show_sample=sample_size)
     df_gold = TO_DF if corpus == TIGER else HO_DF
@@ -101,7 +101,7 @@ def run_evaluation_for(corpus, framework, analyse=True):
     # TODO: und daher nicht von NLTK gelernt werden konnte. Am nächsten verwandt: PIAT => ersetzen
     results = evaluate(combined)
     tprint(results)
-    results.to_csv(os.path.join(OUT_DIR, '{}_{}_{}_results.csv'.format(corpus, framework, TAGSET)), sep='\t')
+    results.to_csv(os.path.join(OUT_DIR, '{}_{}_{}_results_new.csv'.format(corpus, framework, TAGSET)), sep='\t')
 
 
 def analyse_tagset(df, corpus, framework):

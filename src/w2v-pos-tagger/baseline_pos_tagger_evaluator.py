@@ -4,10 +4,11 @@ from time import time
 
 import pandas as pd
 
-from data_loader import (
-    tprint, OUT_DIR, get_preprocessed_corpus, get_selftagged_corpus)
-from constants import SPACY, NLTK, TIGER, HDT, FORM, SELF_TXT, SELF_TAG, GOLD_TXT, GOLD_TAG, TP, \
-    FP, FN, PREC, RECL, F1, STTS, UNIV
+from data_loader import tprint, OUT_DIR, get_preprocessed_corpus, get_selftagged_corpus
+from constants import (
+    SPACY, NLTK, TIGER, HDT, FORM, SELF_TXT, SELF_TAG, GOLD_TXT, GOLD_TAG, TP,
+    FP, FN, PREC, RECL, F1, STTS, UNIV, TN
+)
 
 
 def concat_df(selftagged, reference):

@@ -25,30 +25,24 @@ def compare_to_stts(corpus, df, tagset_key=STTS):
 
     corp = corpus
     tagset = set(filter(lambda x: x not in {'_', ''}, df[tagset_key].unique()))
-    print("\n{}/{} tagset:\n{}".format(corp, tagset_key, sorted(tagset)))
-    print("length:", len(tagset))
-    print("{}/{} tags missing in STTS: {}".format(corp, tagset_key, sorted(tagset - STTS_DEFAULT)))
-    print(
-        "STTS tags missing in {}/{}: {}\n".format(corp, tagset_key, sorted(STTS_DEFAULT - tagset))
-    )
+    print(f"\n{corp}/{tagset_key} tagset:\n{sorted(tagset)}")
+    print(f"length: {len(tagset)}")
+    print(f"{corp}/{tagset_key} tags missing in STTS: {sorted(tagset - STTS_DEFAULT)}")
+    print(f"STTS tags missing in {corp}/{tagset_key}: {sorted(STTS_DEFAULT - tagset)}\n")
 
 
 def main():
-    show_sample = False
-
-    print("STTS tagset:\n{}".format(sorted(STTS_DEFAULT)))
-    print("length: {}\n".format(len(STTS_DEFAULT)))
+    print(f"STTS tagset:\n{sorted(STTS_DEFAULT)}")
+    print(f"length: {len(STTS_DEFAULT)}\n")
 
     t_df = get_original_corpus(TIGER, raw=True)
-    if show_sample:
-        tprint(t_df.head(50))
+    tprint(t_df.head(50))
 
     # analyzing STTS tagset in Tiger
     compare_to_stts(TIGER, t_df)
 
     h_df = get_original_corpus(HDT, raw=True)
-    if show_sample:
-        tprint(h_df.head(50))
+    tprint(h_df.head(50))
 
     # analyzing STTS tagset in HDT
     compare_to_stts(HDT, h_df)

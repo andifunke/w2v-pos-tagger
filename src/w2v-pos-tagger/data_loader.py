@@ -40,22 +40,11 @@ FILES = {
 def conv_tags(tag):
     """Replaces wrong tags in a corpus."""
 
-    if tag in CORPUS_BUGS:
-        return CORPUS_BUGS[tag]
-
-    return tag
+    return CORPUS_BUGS.get(tag, tag)
 
 
 def conv_token_id(token_id):
     return int(token_id.split('_')[1])
-
-
-def get_preprocessed_corpus(corpus):
-    assert corpus in {TIGER, HDT}
-    print(f'Reading preprocessed {corpus} corpus')
-    return pd.read_csv(
-        FILES[PREPROCESSED](corpus), sep="\t", dtype={TOKN_ID: int, SENT_ID: int}, na_filter=False
-    )
 
 
 CONVERTERS = {
@@ -64,6 +53,14 @@ CONVERTERS = {
     SPACY: {STTS: conv_tags},
     NLTK: None
 }
+
+
+def get_preprocessed_corpus(corpus):
+    assert corpus in {TIGER, HDT}
+    print(f'Reading preprocessed {corpus} corpus')
+    return pd.read_csv(
+        FILES[PREPROCESSED](corpus), sep="\t", dtype={TOKN_ID: int, SENT_ID: int}, na_filter=False
+    )
 
 
 def get_selftagged_corpus(corpus=TIGER, framework=SPACY, show_sample=0):
@@ -164,7 +161,7 @@ def main():
         df = get_original_corpus(corpus, print_sample=-50)
         print(f'Writing {FILES[PREPROCESSED](corpus)}')
         df.to_csv(FILES[PREPROCESSED](corpus), sep='\t', index=False)
-        print(f"{corpus} done in {time() - t0:.2f}s\n")
+        print(f'{corpus} done in {time() - t0:.2f}s\n')
 
 
 if __name__ == '__main__':
