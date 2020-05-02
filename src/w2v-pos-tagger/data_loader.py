@@ -7,11 +7,11 @@ Maps the STTS tagset to the reduced Universal tagset.
 
 Run this script as __main__ to cache the conversions into csv files in ``./corpora/out``.
 """
-
 from pathlib import Path
 from time import time
 
 import pandas as pd
+from pandarallel import pandarallel
 from tabulate import tabulate
 
 from constants import (
@@ -50,43 +50,6 @@ def conv_token_id(token_id):
     return int(token_id.split('_')[1])
 
 
-def read_raw(file, keys, converters=None, raw=False):
-    """
-    Reads a file with given column names (keys) and applies converters.
-
-    Returns a DataFrame.
-    """
-
-    if raw:
-        use_cols = None
-        dtype = None
-    else:
-        use_cols = KEYS[MINIMAL]
-        if converters is not None and TOKN_ID in converters:
-            dtype = None
-        else:
-            dtype = {TOKN_ID: int}
-
-    df = pd.read_csv(
-        file, sep="\t", names=keys, header=None, usecols=use_cols, dtype=dtype,
-        skip_blank_lines=True, quotechar='\x07', converters=converters, na_filter=False,
-    )
-
-    if not raw:
-        def add_univ(stts):
-            return STTS_UNI_MAP[stts]
-
-        def conv_lemm(form, lemm):
-            return form if lemm == '--' else lemm
-
-        df[UNIV] = df.apply(lambda row: add_univ(row[STTS]), axis=1)
-        df[LEMM] = df.apply(lambda row: conv_lemm(row[FORM], row[LEMM]), axis=1)
-        sent_split = df[TOKN_ID] <= df[TOKN_ID].shift(fill_value=1)
-        df[SENT_ID] = sent_split.cumsum()
-
-    return df
-
-
 def get_preprocessed_corpus(corpus):
     assert corpus in {TIGER, HDT}
     print(f'Reading preprocessed {corpus} corpus')
@@ -103,23 +66,6 @@ CONVERTERS = {
 }
 
 
-def get_original_corpus(corpus, show_sample=0, raw=False):
-    assert corpus in {TIGER, HDT}, f'{corpus} is an unknown corpus.'
-
-    print(f'Reading original {corpus} corpus')
-    df = pd.concat([
-        read_raw(file, KEYS[corpus], converters=CONVERTERS[corpus], raw=raw)
-        for file in FILES[corpus]
-    ])
-    df[CORP] = corpus
-    if not raw:
-        df = df[KEYS[DEFAULT]]
-    if show_sample:
-        tprint(df, show_sample)
-
-    return df
-
-
 def get_selftagged_corpus(corpus=TIGER, framework=SPACY, show_sample=0):
     assert corpus in {TIGER, HDT}, f'{corpus} is an unknown corpus.'
     assert framework in {SPACY, NLTK}, f'{framework} is an unknown framework.'
@@ -132,6 +78,66 @@ def get_selftagged_corpus(corpus=TIGER, framework=SPACY, show_sample=0):
     )
     if show_sample:
         tprint(df, show_sample)
+    return df
+
+
+def get_original_corpus(corpus, print_sample=0, raw=False):
+    """
+    Reads a given corpus and applies converters.
+
+    Returns a DataFrame.
+    """
+    assert corpus in {TIGER, HDT}, f'{corpus} is an unknown corpus.'
+
+    print(f'>>> Reading original {corpus} corpus')
+    converters = CONVERTERS[corpus]
+
+    if raw:
+        use_cols = None
+        dtype = None
+    else:
+        use_cols = KEYS[MINIMAL]
+        if converters is not None and TOKN_ID in converters:
+            dtype = None
+        else:
+            dtype = {TOKN_ID: int}
+
+    df = []
+    for file in FILES[corpus]:
+        print(f'Reading file {file}')
+        df.append(
+            pd.read_csv(
+                file, sep="\t", names=KEYS[corpus], header=None, usecols=use_cols, dtype=dtype,
+                skip_blank_lines=True, quotechar='\x07', converters=converters, na_filter=False,
+            )
+        )
+    df = pd.concat(df)
+    df[CORP] = corpus
+
+    if not raw:
+        def add_univ(stts):
+            return STTS_UNI_MAP[stts]
+
+        def conv_lemm(form, lemm):
+            return form if lemm == '--' else lemm
+
+        print('Adding Universal Tagset')
+        df[UNIV] = df.parallel_apply(lambda row: add_univ(row[STTS]), axis=1)
+        print()
+
+        print('Correcting Lemmata')
+        df[LEMM] = df.parallel_apply(lambda row: conv_lemm(row[FORM], row[LEMM]), axis=1)
+        print()
+
+        print('Adding Sentence IDs')
+        sent_split = df[TOKN_ID] <= df[TOKN_ID].shift(fill_value=1)
+        df[SENT_ID] = sent_split.cumsum()
+
+        df = df[KEYS[DEFAULT]]
+
+    if print_sample:
+        tprint(df, print_sample)
+
     return df
 
 
@@ -155,10 +161,16 @@ def main():
 
     for corpus in [TIGER, HDT]:
         t0 = time()
-        df = get_original_corpus(corpus, show_sample=50)
+        df = get_original_corpus(corpus, print_sample=-50)
+        print(f'Writing {FILES[PREPROCESSED](corpus)}')
         df.to_csv(FILES[PREPROCESSED](corpus), sep='\t', index=False)
-        print(f"{corpus} done in {time() - t0:.2f}s")
+        print(f"{corpus} done in {time() - t0:.2f}s\n")
 
 
 if __name__ == '__main__':
+    try:
+        pandarallel.initialize(progress_bar=True, use_memory_fs=True)
+    except SystemError:
+        pandarallel.initialize(progress_bar=True)
+
     main()
