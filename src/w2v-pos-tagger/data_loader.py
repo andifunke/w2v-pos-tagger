@@ -10,12 +10,13 @@ Run this script as __main__ to cache the conversions into csv files in ``./corpo
 from pathlib import Path
 from time import time
 
+import numpy as np
 import pandas as pd
 from pandarallel import pandarallel
 from tabulate import tabulate
 
 from constants import (
-    SPACY, NLTK, TIGER, HDT, MINIMAL, DEFAULT, PREPROCESSED, SELFTAGGED, SENT_ID,
+    SPACY, NLTK, TIGER, HDT, MINIMAL, DEFAULT, PREPROCESSED, PREDICTIONS, SENT_ID,
     TOKN_ID, FORM, LEMM, STTS, UNIV, CORP, KEYS, CORPUS_BUGS, STTS_UNI_MAP
 )
 
@@ -33,14 +34,14 @@ FILES = {
     TIGER: [TIGER_DIR / 'tiger_release_aug07.corrected.16012013.conll09'],
     HDT: [HDT_DIR / f for f in ['part_A.conll', 'part_B.conll', 'part_C.conll']],
     PREPROCESSED: lambda corpus: OUT_DIR / f'{corpus}_preprocessed.csv',
-    SELFTAGGED: lambda corpus, framework: OUT_DIR / f'{corpus}_pos_by_{framework}.csv'
+    PREDICTIONS: lambda corpus, framework: OUT_DIR / f'{corpus}_pos_by_{framework}.csv'
 }
 
 
-def conv_tags(tag):
+def conv_tags(tag, mapping: dict = CORPUS_BUGS):
     """Replaces wrong tags in a corpus."""
 
-    return CORPUS_BUGS.get(tag, tag)
+    return mapping.get(tag, tag)
 
 
 def conv_token_id(token_id):
@@ -49,7 +50,7 @@ def conv_token_id(token_id):
 
 CONVERTERS = {
     TIGER: {STTS: conv_tags, TOKN_ID: conv_token_id},
-    HDT: {STTS: conv_tags},
+    HDT: {STTS: lambda x: conv_tags(x, {**CORPUS_BUGS, 'PIDAT': 'PIAT'})},
     SPACY: {STTS: conv_tags},
     NLTK: None
 }
@@ -69,9 +70,8 @@ def get_selftagged_corpus(corpus=TIGER, framework=SPACY, show_sample=0):
 
     print(f'Reading {corpus} corpus, annotated with {framework}')
     df = pd.read_csv(
-        FILES[SELFTAGGED](corpus, framework), sep="\t", names=KEYS[SELFTAGGED],
-        header=None, dtype={SENT_ID: int, TOKN_ID: int}, converters=CONVERTERS[framework],
-        skip_blank_lines=True, quotechar='\x07', na_filter=False
+        FILES[PREDICTIONS](corpus, framework), sep="\t", dtype={SENT_ID: int, TOKN_ID: int},
+        converters=CONVERTERS[framework], skip_blank_lines=True, quotechar='\x07', na_filter=False
     )
     if show_sample:
         tprint(df, show_sample)
@@ -145,7 +145,13 @@ def tprint(df: pd.DataFrame, head=0, to_latex=False):
         df = df.head(head)
     elif head < 0:
         df = df.tail(-head)
-    print(tabulate(df, headers="keys", tablefmt="pipe", floatfmt=".3f") + '\n')
+
+    formats = [".0f"] + [
+        ".3f" if dt in [np.dtype('float64'), np.dtype('float32')]
+        else ".0f"
+        for dt in df.dtypes
+    ]
+    print(tabulate(df, headers="keys", tablefmt="pipe", floatfmt=formats) + '\n')
 
     if to_latex:
         print(df.to_latex(bold_rows=True))

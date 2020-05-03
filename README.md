@@ -116,7 +116,7 @@ tagger we will train it first. This requires to clone an additional repository f
 git clone git@github.com:ptnplanet/NLTK-Contributions.git lib/NLTK-Contributions
 cp lib/NLTK-Contributions/ClassifierBasedGermanTagger/ClassifierBasedGermanTagger.py src/w2v-pos-tagger/
 
-python src/w2v-pos-tagger/nltk_tiger_trainer.py --evaluate
+python src/w2v-pos-tagger/nltk_tiger_trainer.py
 ```
 
 The newly trained NLTK tagger will be saved to `./corpora/out/nltk_german_classifier_data.pickle`.
@@ -131,15 +131,15 @@ python src/w2v-pos-tagger/baseline_pos_tagger.py
 #### 3.3 Evaluation
 
 ```bash
-python src/w2v-pos-tagger/pos_tagger_evaluator.py
+python src/w2v-pos-tagger/baseline_pos_tagger_evaluator.py
 ```
 
 will measure the performance of the newly tagged corpora against the ground truth
 on several related metrics:
 
 * accuracy
-* precision
-* recall
-* F<sub>1</sub> measure
+* precision (weighted)
+* recall (weighted)
+* F<sub>1</sub> measure (weighted)
 
 The script expects that the `baseline_pos_tagger.py` has already been run.

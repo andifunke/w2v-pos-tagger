@@ -3,6 +3,7 @@
 """
 Applies part-of-speech tagging via spaCy and NLTK to the TIGER and HDT corpus.
 """
+
 import argparse
 import csv
 import multiprocessing as mp
@@ -18,7 +19,7 @@ from tqdm import tqdm
 
 from data_loader import OUT_DIR, get_preprocessed_corpus
 from constants import (
-    SPACY, NLTK, TIGER, HDT, SENT_ID, TOKN_ID, FORM, STTS, UNIV, CORP, STTS_UNI_MAP_EXTENDED
+    SPACY, NLTK, TIGER, HDT, SENT_ID, STTS, UNIV, STTS_UNI_MAP_EXTENDED, KEYS, PREDICTIONS
 )
 
 
@@ -43,7 +44,7 @@ def tag_sentence(group, tagger):
     group[STTS] = tagged_sent
     group[UNIV] = group.STTS.map(STTS_UNI_MAP_EXTENDED)
 
-    return group[[CORP, SENT_ID, TOKN_ID, FORM, STTS, UNIV]]
+    return group[KEYS[PREDICTIONS]]
 
 
 def tag_chunk(chunk, tagger):
@@ -69,9 +70,8 @@ def tag_corpus(corpus, tagger, workers: int = -1):
 
 def parse_args() -> argparse.Namespace:
     """
-    Parses module-specific arguments.
-
-    Solves argument dependencies and returns cleaned up arguments.
+    Parses module-specific arguments. Solves argument dependencies
+    and returns cleaned up arguments.
 
     :returns: arguments object
     """

@@ -69,7 +69,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--evaluate', action='store_true', required=False,
-        help='Evaluate the model after training.'
+        help='Evaluate the model after training. Will reduce the number of samples for training.'
     )
     parser.set_defaults(evaluate=False)
     args = parser.parse_args()
