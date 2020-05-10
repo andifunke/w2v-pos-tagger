@@ -1,98 +1,97 @@
 #!/usr/bin/env python3
 
 """
-In parts inspired by
-http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#sphx-glr-auto-examples-text-document-classification-20newsgroups-py
+Train an SVM Part-of-Speech-Tagger.
 """
 
 import argparse
 import json
+import pickle
 from datetime import datetime
+from time import time
 
 import numpy as np
-import six.moves.cPickle as cPickle
-from sklearn import svm, preprocessing
+from gensim.models.word2vec import Word2Vec
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.svm import SVC
 
-from data_loader import *
+from constants import TIGER, FORM, UNIV, UNIV_TAGS
+from data_loader import MODEL_DIR, EMBEDDINGS_DIR, get_preprocessed_corpus
 
 
-# argument parsing and setting default values
-def get_options():
+def parse_args() -> argparse.Namespace:
+    """
+    Parses module-specific arguments. Solves argument dependencies
+    and returns cleaned up arguments.
+
+    :returns: arguments object
+    """
+
     parser = argparse.ArgumentParser(description='nlp exercise 2')
 
-    parser.add_argument('--prepare', dest='prepare', action='store_true')
-    parser.add_argument('--no-prepare', dest='prepare', action='store_false')
-    parser.set_defaults(prepare=False)
-    parser.add_argument('--train', dest='train', action='store_true')
-    parser.add_argument('--no-train', dest='train', action='store_false')
-    parser.set_defaults(train=False)
-    parser.add_argument('--test', dest='test', action='store_true')
-    parser.add_argument('--no-test', dest='test', action='store_false')
-    parser.set_defaults(test=False)
-    parser.add_argument('--shrinking', dest='shrinking', action='store_true')
-    parser.add_argument('--no-shrinking', dest='shrinking', action='store_false')
-    parser.set_defaults(shrinking=False)
+    # --- log progress ---
     parser.add_argument('--verbose', dest='verbose', action='store_true')
     parser.add_argument('--no-verbose', dest='verbose', action='store_false')
     parser.set_defaults(verbose=True)
-    parser.add_argument('--pretrained', dest='pretrained', action='store_true')
-    parser.add_argument('--no-pretrained', dest='pretrained', action='store_false')
-    parser.set_defaults(pretrained=False)
-    parser.add_argument('--scale', dest='scale', action='store_true')
-    parser.add_argument('--no-scale', dest='scale', action='store_false')
-    parser.set_defaults(scale=False)
+
+    # --- Choice of pretrained embedding variation ---
+    parser.add_argument('-a', '--architecture', default='sg', type=str, choices=['cb', 'sg'])
+    parser.add_argument('-d', '--dimensionality', default=25, type=int)
     parser.add_argument('--lowercase', dest='lowercase', action='store_true')
     parser.add_argument('--no-lowercase', dest='lowercase', action='store_false')
     parser.set_defaults(lowercase=False)
-    parser.add_argument('--gensim', dest='gensim', action='store_true')
-    parser.add_argument('--no-gensim', dest='gensim', action='store_false')
-    parser.set_defaults(gensim=False)
+    parser.add_argument(
+        '--train_size', default=0, type=int,
+        help='Train only on a slice of the trainset with length `train_size`.'
+    )
 
-    parser.add_argument('--train_size', default=0, type=int,
-                        help='train only on slice of given length')
-    parser.add_argument('--test_size', default=0, type=int,
-                        help='test only on slice of given length')
-    parser.add_argument('--C', default=1.0, type=float)
-    parser.add_argument('--cache_size', default=2000, type=int)
-    parser.add_argument('--max_iter', default=-1, type=int)
-    parser.add_argument('--kernel', default='rbf', type=str,
-                        choices=['linear', 'poly', 'rbf'])
-    parser.add_argument('--embedding_size', default=25, type=int,
-                        choices=[12, 25, 50, 100])
-    parser.add_argument('--embedding_model', default='sg', type=str,
-                        choices=['cb', 'sg'])
-    parser.add_argument('--clf_file', default='', type=str)
-    parser.add_argument('--model_file', default='', type=str)
-    parser.add_argument('--model_dir', default=CORPORA_DIR, type=str)
+    # --- SVC parameters ---
+    parser.add_argument('--shrinking', dest='shrinking', action='store_true')
+    parser.add_argument('--no-shrinking', dest='shrinking', action='store_false')
+    parser.set_defaults(shrinking=False)
 
-    return vars(parser.parse_args())
+    parser.add_argument(
+        '--scale', dest='scale', action='store_true', help='Normalize the feature vectors.'
+    )
+    parser.add_argument('--no-scale', dest='scale', action='store_false')
+    parser.set_defaults(scale=False)
+
+    parser.add_argument('--C', default=1.0, type=float, help="Soft-margin parameter.")
+    parser.add_argument(
+        '--cache-size', default=2000, type=int,
+        help="Specify the size of the kernel cache (in MB)."
+    )
+
+    parser.add_argument('--max-iter', default=-1, type=int, help="Limit the number of iterations.")
+    parser.add_argument('--kernel', default='rbf', type=str, choices=['linear', 'poly', 'rbf'])
+
+    args = parser.parse_args()
+    print(args)
+
+    return args
 
 
-def get_xy(corpus, size=0, embedding_size=12, embedding_model='sg', lowercase=False):
+def trainset(corpus, size=0, dimensionality=12, architecture='sg', lowercase=False):
     """ embedding_size, embedding_model and lowercase are only applicable, if pretrained is False.
     In this case the custom trained embeddings are used. Values must correspond to existing w2v model files. """
 
     # gensim cannot be used on hpc
     lc = '_lc' if lowercase else ''
-    fname = path.join(CORPORA_DIR, 'custom_embedding_{}_{:d}{}.vec'.format(embedding_model, embedding_size, lc))
-    if 'OPTIONS' in globals() and OPTIONS['gensim']:
-        import gensim.models.word2vec as wv
-        model = wv.Word2Vec.load(fname)
-        word_vectors = model.wv
-    else:
-        word_vectors = pd.read_pickle(fname + '.pickle')
-    print('loading embeddings from', fname)
+    emb_path = EMBEDDINGS_DIR / f'{architecture}_{dimensionality:03d}{lc}.w2v'
+    model = Word2Vec.load(str(emb_path))
+    word_vectors = model.wv
+    print('loading embeddings from', emb_path)
 
     print('loading corpora')
     df = get_preprocessed_corpus(corpus)[[FORM, UNIV]]
 
     # this is using only the token as feature
     if size == 0:
-        X = df[FORM].as_matrix()
-        y = df[UNIV].as_matrix()
+        X = df[FORM].values
+        y = df[UNIV].values
     else:
-        X = df[FORM].as_matrix()[:size]
-        y = df[UNIV].as_matrix()[:size]
+        X = df[FORM].values[:size]
+        y = df[UNIV].values[:size]
 
     if lowercase:
         X = [word_vectors[token.lower()] for token in X]
@@ -106,56 +105,85 @@ def get_xy(corpus, size=0, embedding_size=12, embedding_model='sg', lowercase=Fa
     return X, y
 
 
-def train_main():
-    embedding_size = OPTIONS['embedding_size']
-    embedding_model = OPTIONS['embedding_model']
-    lowercase = OPTIONS['lowercase']
+def __trainset(corpus, size=0, dimensionality=25, architecture='sg', lowercase=False):
+
+    lc = '_lc' if lowercase else ''
+
+    emb_path = EMBEDDINGS_DIR / f'{architecture}_{dimensionality:03d}{lc}.w2v'
+    print('Loading embeddings from', emb_path)
+    model = Word2Vec.load(str(emb_path))
+    word_vectors = model.wv
+
+    size = None if size < 1 else size
+    df = get_preprocessed_corpus(corpus)[[FORM, UNIV]]
+    df = df[:size]
+
+    # X = df.FORM.apply(lambda x: pd.Series(word_vectors[x])).values
+    # y = df.
+    # quit()
+
+    # y = [UNIV_TAGS[label] for label in y]
+    # X = np.asarray(X, dtype=float, order='C')
+    # y = np.asarray(y, dtype=int, order='C')
+    # assert len(X) == len(y)
+
+    # return X, y
+
+
+def main():
+    args = parse_args()
+
+    embedding_size = args.dimensionality
+    embedding_model = args.architecture
+    lowercase = args.lowercase
 
     t0 = time()
     dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
 
-    train_fname = '{}_custom_{}_{}{}'.format(dt, embedding_model, embedding_size, '_lc' if lowercase else '')
+    save_dir = MODEL_DIR / dt
+    train_id = f"{embedding_model}_{embedding_size}{'_lc' if lowercase else ''}"
 
-    X, y = get_xy(TIGER,
-                  size=OPTIONS['train_size'],
-                  embedding_size=embedding_size,
-                  embedding_model=embedding_model,
-                  lowercase=lowercase)
+    X, y = trainset(
+        TIGER,
+        size=args.train_size,
+        dimensionality=embedding_size,
+        architecture=embedding_model,
+        lowercase=lowercase
+    )
 
-    if OPTIONS['scale']:
-        scaler = preprocessing.MinMaxScaler()
+    if args.scale:
+        scaler = MinMaxScaler()
         scaler.fit(X)
         X = scaler.transform(X)
-        scale_fname = path.join(CORPORA_DIR, train_fname + '_scale.pickle')
-        print('saving scaler to', scale_fname)
-        with open(scale_fname, 'wb') as f:
-            cPickle.dump(scaler, f)
+        scaler_path = save_dir / f'{train_id}.scaler'
+        print('Saving scaler to', scaler_path)
+        with open(scaler_path, 'wb') as fp:
+            pickle.dump(scaler, fp)
 
-    print(OPTIONS)
-
-    print('start training')
-    clf = svm.SVC(C=OPTIONS['C'], cache_size=OPTIONS['cache_size'], class_weight=None, kernel=OPTIONS['kernel'],
-                  decision_function_shape='ovr', gamma='auto', max_iter=OPTIONS['max_iter'], random_state=None,
-                  shrinking=OPTIONS['shrinking'], tol=0.001, verbose=OPTIONS['verbose'])
-    print('\n' + str(clf))
+    print('Starting training')
+    clf = SVC(
+        C=args.C, cache_size=args.cache_size, class_weight=None, kernel=args.kernel,
+        decision_function_shape='ovr', gamma='auto', max_iter=args.max_iter, random_state=None,
+        shrinking=args.shrinking, tol=0.001, verbose=args.verbose
+    )
+    print(f'\n{clf}')
 
     print('fitting...')
     clf.fit(X, y)
 
-    clf_fname = path.join(CORPORA_DIR, train_fname + '_clf.pickle')
-    print('\nsaving clf to', clf_fname)
-    with open(clf_fname, 'wb') as f:
-        cPickle.dump(clf, f)
+    model_file = save_dir / f'{train_id}.model'
+    print('\nsaving clf to', model_file)
+    with open(model_file, 'wb') as f:
+        pickle.dump(clf, f)
 
-    OPTIONS['time_train'] = time() - t0
-    options_fname = path.join(CORPORA_DIR, train_fname + '_options.json')
-    print('saving options to', options_fname)
-    with open(options_fname, 'w') as f:
-        json.dump(OPTIONS, f)
+    args.time_train = time() - t0
+    config_file = save_dir / f'{train_id}.config'
+    print('saving options to', config_file)
+    with open(config_file, 'w') as fp:
+        json.dump(vars(args), fp)
 
-    print("done in {:f}s".format(OPTIONS['time_train']))
+    print(f"Done in {args.time_train:.3f}s")
 
 
 if __name__ == '__main__':
-    OPTIONS = get_options()
-    train_main()
+    main()

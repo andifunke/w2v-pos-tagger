@@ -13,7 +13,7 @@ from sklearn.metrics import f1_score
 
 from data_loader import *
 # argument parsing and setting default values
-from svm_tagger_train import get_xy, get_options
+from svm_tagger_train import trainset, get_options
 
 
 def test_main(directory=None, file=None):
@@ -55,8 +55,8 @@ def test_main(directory=None, file=None):
     embedding_size = int(embedding_infos[4])
     lowercase = True if (len(embedding_infos) > 5 and embedding_infos[5] == 'lc') else False
 
-    X, y_true = get_xy(HDT, size=OPTIONS['test_size'], pretrained=pretrained, embedding_size=embedding_size,
-                       embedding_model=embedding_model, lowercase=lowercase)
+    X, y_true = trainset(HDT, size=OPTIONS['test_size'], pretrained=pretrained, dimensionality=embedding_size,
+                         architecture=embedding_model, lowercase=lowercase)
 
     # using the scaler only if the data was trained on scaled values
     if scaler is not None:

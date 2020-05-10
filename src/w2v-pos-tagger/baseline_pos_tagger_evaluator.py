@@ -15,7 +15,7 @@ from constants import (
     SPACY, NLTK
 )
 from corpora_analyser import get_tagset
-from data_loader import FORM, get_preprocessed_corpus, get_selftagged_corpus, tprint, OUT_DIR
+from data_loader import FORM, get_preprocessed_corpus, get_selftagged_corpus, tprint, EVAL_DIR
 
 
 def concat(predictions, reference, tagset):
@@ -112,6 +112,7 @@ def parse_args() -> argparse.Namespace:
         '--analyse', action='store_true',
         help="Analyse the tagging instead of calculating metrics."
     )
+    parser.set_defaults(analyse=False)
     args = parser.parse_args()
     return args
 
@@ -148,16 +149,17 @@ def main():
                 results = evaluate(df)
 
                 tprint(results)
-                print(f"Accuracy:           {results.loc['sum', PREC]:.3f}")
-                print(f"Weighted Precision: {results.loc['weighted avg', PREC]:.3f}")
-                print(f"Weighted Recall:    {results.loc['weighted avg', RECL]:.3f}")
-                print(f"Weighted F1 score:  {results.loc['weighted avg', F1]:.3f}")
-                print()
+                print(
+                    f"Accuracy:           {results.loc['sum', PREC]:.3f}\n"
+                    f"Weighted Precision: {results.loc['weighted avg', PREC]:.3f}\n"
+                    f"Weighted Recall:    {results.loc['weighted avg', RECL]:.3f}\n"
+                    f"Weighted F1 score:  {results.loc['weighted avg', F1]:.3f}\n"
+                )
 
-                file_path = OUT_DIR / f'{corpus}_{framework}_{tagset}_results.csv'
-                print(f"Writing to {file_path}")
+                file_path = EVAL_DIR / f'{corpus}_{framework}_{tagset}.csv'
+                print(f"Writing to {file_path}\n")
+                EVAL_DIR.mkdir(exist_ok=True)
                 results.to_csv(file_path, sep='\t', float_format='%.3f')
-                print()
 
     print(f"All done in {time()-t0:.2f}s")
 
