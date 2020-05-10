@@ -27,8 +27,8 @@ was as follows:
    as training set.
  * Use the [HDT corpus](https://corpora.uni-hamburg.de/hzsk/de/islandora/object/treebank:hdt)
    as test set.
- * Use the [STTS](http://www.sfs.uni-tuebingen.de/resources/stts-1999.pdf) as well as the
-   [Universal tagset](https://universaldependencies.org/u/pos/) as classes.
+ * Map the [STTS](http://www.sfs.uni-tuebingen.de/resources/stts-1999.pdf) annotations to the
+   [Universal tagset](https://universaldependencies.org/u/pos/) and use the latter as labels.
  * Train a POS-tagger model on an
    [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
    using an RBF kernel.
@@ -211,6 +211,19 @@ the number of iterations over the corpus for better performance:
 python src/w2v-pos-tagger/embedding_builder.py --epochs 30
 ```
 
-#### 3.3.2 Train an SVM Classifier
+#### 3.3.2 Train a Support Vector Classifier
+
+Finally, let's train our model.
 
 
+```
+python src/w2v-pos-tagger/svm_tagger_train.py
+```
+
+The hyperparameters of the SVM can be partly customized. You can chose one of the 
+pretrained words embeddings and other training parameters. Start with the defaults
+and then find additional information in the script's help.
+
+```
+python src/w2v-pos-tagger/svm_tagger_train.py --help
+```

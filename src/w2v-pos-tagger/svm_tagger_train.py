@@ -71,7 +71,7 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
-def trainset(corpus, size=0, dimensionality=12, architecture='sg', lowercase=False):
+def __trainset(corpus, size=0, dimensionality=12, architecture='sg', lowercase=False):
     """ embedding_size, embedding_model and lowercase are only applicable, if pretrained is False.
     In this case the custom trained embeddings are used. Values must correspond to existing w2v model files. """
 
@@ -105,7 +105,7 @@ def trainset(corpus, size=0, dimensionality=12, architecture='sg', lowercase=Fal
     return X, y
 
 
-def __trainset(corpus, size=0, dimensionality=25, architecture='sg', lowercase=False):
+def trainset(corpus, size=0, dimensionality=25, architecture='sg', lowercase=False):
 
     lc = '_lc' if lowercase else ''
 
@@ -118,16 +118,10 @@ def __trainset(corpus, size=0, dimensionality=25, architecture='sg', lowercase=F
     df = get_preprocessed_corpus(corpus)[[FORM, UNIV]]
     df = df[:size]
 
-    # X = df.FORM.apply(lambda x: pd.Series(word_vectors[x])).values
-    # y = df.
-    # quit()
+    X = np.stack(df.FORM.map(word_vectors.word_vec))
+    y = df.UNIV.map(UNIV_TAGS.get).values
 
-    # y = [UNIV_TAGS[label] for label in y]
-    # X = np.asarray(X, dtype=float, order='C')
-    # y = np.asarray(y, dtype=int, order='C')
-    # assert len(X) == len(y)
-
-    # return X, y
+    return X, y
 
 
 def main():
@@ -141,6 +135,7 @@ def main():
     dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
 
     save_dir = MODEL_DIR / dt
+    save_dir.mkdir(exist_ok=True, parents=True)
     train_id = f"{embedding_model}_{embedding_size}{'_lc' if lowercase else ''}"
 
     X, y = trainset(
