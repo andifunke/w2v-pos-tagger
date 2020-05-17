@@ -13,7 +13,6 @@ from time import time
 
 import numpy as np
 import pandas as pd
-import psutil
 import spacy
 from tqdm import tqdm
 
@@ -58,7 +57,7 @@ def tag_corpus(corpus, tagger, workers: int = -1):
 
     groups = corpus.groupby(SENT_ID)
     if workers < 1:
-        workers = psutil.cpu_count(logical=False)
+        workers = mp.cpu_count()
     print(f'Parallelized using {workers} workers.')
     ctx = mp.get_context('fork')
     with ctx.Pool(workers) as pool:

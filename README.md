@@ -74,17 +74,15 @@ conda env create -f environment.yml
 conda activate w2vpos
 ```
 
-Install the German spaCy model:
+For convenience install the project as a package:
 
 ```bash
-python -m spacy download de
+python setup.py develop
 ```
 
 Download the required part-of-speech annotated corpora:
 
 ```bash
-mkdir -p corpora/tiger-conll
-
 # TIGER
 echo "Please view and accept the license agreement for the TIGER corpus."
 xdg-open https://www.ims.uni-stuttgart.de/documents/ressourcen/korpora/tiger-corpus/license/htmlicense.html
@@ -94,20 +92,56 @@ curl https://www.ims.uni-stuttgart.de/documents/ressourcen/korpora/tiger-corpus/
 curl -SL "https://corpora.uni-hamburg.de:8443/fedora/objects/file:hdt_hdt-conll/datastreams/hdt-conll-tar-xz/content?asOfDateTime=2016-02-17T15:38:47.643Z&download=true" | tar xvfJ - -C corpora
 ```
 
+In order to train an NLTK based reference model we need one more dependency:
+
+```bash
+git clone git@github.com:ptnplanet/NLTK-Contributions.git lib/NLTK-Contributions
+cp lib/NLTK-Contributions/ClassifierBasedGermanTagger/ClassifierBasedGermanTagger.py src/w2v-pos-tagger/
+```
+
+
 ## 3 — Documentation
+
+
+### 3.0 TL;DR
+
+```bash
+# describe the copora and their labels
+w2vpos-corpora-analyser
+
+# preprocess the corpora
+w2vpos-data-loader
+
+# train an NLTK baseline model
+w2vpos-nltk-tiger-trainer
+
+# tag the corpora with spaCy and NLTK
+w2vpos-baseline-pos-tagger
+
+# evaluate the reference inference
+w2vpos-baseline-pos-tagger-evaluator
+
+# learn distributed word vectors as features for our classifier
+w2vpos-embedding-builder
+
+# train a SVM classifier levearaging those features
+w2vpos-svm-tagger-train
+```
+
+
 
 ### 3.1 Corpus Analysis and Normalization
 
 To analyse the tagset of both corpora, run
 
 ```bash
-python src/w2v-pos-tagger/corpora_analyser.py
+w2vpos-corpora-analyser
 ```
 
 To normalize and fix a few issues in the corpora and to persist the results run
 
 ```bash
-python src/w2v-pos-tagger/data_loader.py
+w2vpos-data-loader
 ```
 
 This will cache the pre-processing as csv files in `corpora/out/`.
@@ -125,13 +159,10 @@ https://github.com/slavpetrov/universal-pos-tags/blob/master/de-tiger.map
 
 Before training our own SVM model we will evaluate the POS-tagging efficiency of common
 NLP frameworks such as `spaCy` and `NLTK`. In order to provide a comparable NLTK based
-tagger we will train it first. This requires cloning an external github repository.
+tagger we will train it first.
 
 ```bash
-git clone git@github.com:ptnplanet/NLTK-Contributions.git lib/NLTK-Contributions
-cp lib/NLTK-Contributions/ClassifierBasedGermanTagger/ClassifierBasedGermanTagger.py src/w2v-pos-tagger/
-
-python src/w2v-pos-tagger/nltk_tiger_trainer.py
+w2vpos-nltk-tiger-trainer
 ```
 
 The newly trained NLTK tagger will be saved to `corpora/out/nltk_german_classifier_data.pickle`.
@@ -139,13 +170,13 @@ The newly trained NLTK tagger will be saved to `corpora/out/nltk_german_classifi
 To apply the spaCy and NLTK part-of-speech tagging run
 
 ```bash
-python src/w2v-pos-tagger/baseline_pos_tagger.py
+w2vpos-baseline-pos-tagger
 ```
 
 #### 3.2.2 Baseline Evaluation
 
 ```bash
-python src/w2v-pos-tagger/baseline_pos_tagger_evaluator.py
+w2vpos-baseline-pos-tagger-evaluator
 ```
 
 will measure the performance of the newly tagged corpora against the ground truth
@@ -158,7 +189,7 @@ on several related metrics:
 
 The evaluation results are saved to `corpora/out/evaluation/`.
 
-The script expects that the `baseline_pos_tagger.py` has already been run.
+The script expects that `w2vpos-baseline-pos-tagger` has already been run.
 
 
 ### 3.3 SVM-Tagger
@@ -171,8 +202,8 @@ and the performance of comparable approaches. We can now build our own SVM class
 Since we will be using word vectors as features for the SVM we will learn an embedding
 space from the combined TIGER and HDT corpus by applying good old word2vec.
 
-```
-python src/w2v-pos-tagger/embedding_builder.py
+```bash
+w2vpos-embedding-builder
 ```
 
 will generate 16 (default) different word embeddings using the following hyperparmeter sets:
@@ -198,8 +229,8 @@ will generate 16 (default) different word embeddings using the following hyperpa
 
 The hyperparameters can be customized. For details:
 
-```
-python src/w2v-pos-tagger/embedding_builder.py --help
+```bash
+w2vpos-embedding-builder
 ```
 
 The embeddings are saved to `corpora/out/embeddings/`.
@@ -207,8 +238,8 @@ The embeddings are saved to `corpora/out/embeddings/`.
 The original project trained the embedding for 5 epochs. You may want to increase
 the number of iterations over the corpus for better performance:
 
-```
-python src/w2v-pos-tagger/embedding_builder.py --epochs 30
+```bash
+w2vpos-embedding-builder --epochs 30
 ```
 
 #### 3.3.2 Train a Support Vector Classifier
@@ -216,14 +247,14 @@ python src/w2v-pos-tagger/embedding_builder.py --epochs 30
 Finally, let's train our model.
 
 
-```
-python src/w2v-pos-tagger/svm_tagger_train.py
+```bash
+w2vpos-svm-tagger-train
 ```
 
 The hyperparameters of the SVM can be partly customized. You can chose one of the 
 pretrained words embeddings and other training parameters. Start with the defaults
 and then find additional information in the script's help.
 
-```
-python src/w2v-pos-tagger/svm_tagger_train.py --help
+```bash
+w2vpos-svm-tagger-train --help
 ```

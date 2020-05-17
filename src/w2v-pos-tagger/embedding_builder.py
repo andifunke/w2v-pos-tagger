@@ -4,10 +4,10 @@
 Learns word vectors from the combines TIGER and HDT corpus by applying word2vec.
 """
 import argparse
+import multiprocessing as mp
 from time import time
 from typing import List
 
-import psutil
 from gensim.models.callbacks import CallbackAny2Vec
 from gensim.models.word2vec import Word2Vec
 from tqdm import tqdm
@@ -112,7 +112,7 @@ def main():
                 t0 = time()
                 print(f"\nstarting w2v {mdl} modelling, size={size}")
 
-                workers = psutil.cpu_count(logical=False)
+                workers = mp.cpu_count()
                 epoch_logger = EpochLogger()
                 model = Word2Vec(
                     sentences, size=size, alpha=0.025, window=5, min_count=0, max_vocab_size=None,
