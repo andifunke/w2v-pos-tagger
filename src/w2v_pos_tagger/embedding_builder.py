@@ -12,8 +12,8 @@ from gensim.models.callbacks import CallbackAny2Vec
 from gensim.models.word2vec import Word2Vec
 from tqdm import tqdm
 
-from constants import TIGER, HDT, SENT_ID, FORM
-from data_loader import get_preprocessed_corpus, EMBEDDINGS_DIR
+from w2v_pos_tagger.constants import TIGER, HDT, SENT_ID, FORM
+from w2v_pos_tagger.data_loader import get_preprocessed_corpus, EMBEDDINGS_DIR
 
 
 def parse_args() -> argparse.Namespace:

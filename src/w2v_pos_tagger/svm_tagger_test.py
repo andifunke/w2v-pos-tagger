@@ -12,7 +12,6 @@ from os import listdir
 from sklearn.metrics import f1_score
 
 from data_loader import *
-# argument parsing and setting default values
 from svm_tagger_train import trainset, get_options
 
 

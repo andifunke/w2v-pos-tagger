@@ -15,7 +15,7 @@ import pandas as pd
 from pandarallel import pandarallel
 from tabulate import tabulate
 
-from constants import (
+from w2v_pos_tagger.constants import (
     SPACY, NLTK, TIGER, HDT, MINIMAL, DEFAULT, PREPROCESSED, PREDICTIONS, SENT_ID,
     TOKN_ID, FORM, LEMM, STTS, UNIV, CORP, KEYS, CORPUS_BUGS, STTS_UNI_MAP
 )

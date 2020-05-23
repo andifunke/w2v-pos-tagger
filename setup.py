@@ -23,8 +23,8 @@ import setuptools
 
 URL = "https://github.com/andifunke/w2v-pos-tagger"
 README = "README.md"
-PACKAGE = "w2v-pos-tagger"
-PACKAGE_DIR = Path('src') / PACKAGE
+PACKAGE = "w2v_pos_tagger"
+PACKAGE_DIR = Path('./src') / PACKAGE
 DEFAULT_SPACY_MODEL = 'en'
 CORPORA = Path('corpora')
 TIGER = CORPORA / 'tiger-conll'
@@ -39,7 +39,7 @@ def install_spacy_model(model=DEFAULT_SPACY_MODEL):
 def read_version():
     print('inferring version')
     try:
-        with open(os.path.join(PACKAGE_DIR, '__init__.py')) as fp:
+        with open(PACKAGE_DIR.resolve() / '__init__.py') as fp:
             for line in fp.readlines():
                 if line.startswith('__version__'):
                     version = line.lstrip("__version__ = '").rstrip("'\n")

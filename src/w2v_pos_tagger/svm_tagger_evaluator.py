@@ -6,8 +6,8 @@ from os import listdir
 
 import matplotlib.pyplot as plt
 
-from data_loader import *
-from svm_tagger_train import get_options
+from w2v_pos_tagger.data_loader import *
+from w2v_pos_tagger.svm_tagger_train import get_options
 
 # making stuff more human readable
 AXES = {

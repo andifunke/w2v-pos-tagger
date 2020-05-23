@@ -2,16 +2,16 @@
 
 #### Single Token Part-of-Speech Tagging using Support Vector Machines and Word Embedding Features
 
-## 0 — Content
+## Content
 
-1) [Introduction](#1-—-introduction)
-2) [Setup](#1-—-Introduction)
+1) [Introduction](#introduction)
+2) [Setup](#2-Setup)
 3) [Documentation](#3-—-documentation)
    1) [Corpus Analysis and Normalization](#3.1-corpus-analysis-&-normalization)
    2) [Baselines](#3.2-baselines)
    3) [SVM-Tagger](#3.3-svm-tagger)
 
-## 1 — Introduction
+## Introduction
 
 **w2v-pos-tagger** is a project submission to an NLP & IR class in *2017*. The task description
 was as follows:
@@ -230,7 +230,7 @@ will generate 16 (default) different word embeddings using the following hyperpa
 The hyperparameters can be customized. For details:
 
 ```bash
-w2vpos-embedding-builder
+w2vpos-embedding-builder --help
 ```
 
 The embeddings are saved to `corpora/out/embeddings/`.
@@ -257,4 +257,25 @@ and then find additional information in the script's help.
 
 ```bash
 w2vpos-svm-tagger-train --help
+
+# optional arguments:
+#  -h, --help            show this help message and exit
+#  --verbose
+#  --no-verbose
+#  -a {cb,sg}, --architecture {cb,sg}
+#  -d DIMENSIONALITY, --dimensionality DIMENSIONALITY
+#  --lowercase
+#  --no-lowercase
+#  --train_size TRAIN_SIZE
+#                        Train only on a slice of the trainset with length
+#                        `train_size`.
+#  --shrinking
+#  --no-shrinking
+#  --scale               Normalize the feature vectors.
+#  --no-scale
+#  --C C                 Soft-margin parameter.
+#  --cache-size CACHE_SIZE
+#                        Specify the size of the kernel cache (in MB).
+#  --max-iter MAX_ITER   Limit the number of iterations.
+#  --kernel {linear,poly,rbf}
 ```

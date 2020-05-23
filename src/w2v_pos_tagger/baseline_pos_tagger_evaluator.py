@@ -10,12 +10,14 @@ from time import time
 import numpy as np
 import pandas as pd
 
-from constants import (
+from w2v_pos_tagger.constants import (
     PRED_TXT, PRED_TAG, GOLD_TXT, GOLD_TAG, TP, FP, FN, PREC, RECL, F1, TIGER, HDT, STTS, UNIV,
     SPACY, NLTK
 )
-from corpora_analyser import get_tagset
-from data_loader import FORM, get_preprocessed_corpus, get_selftagged_corpus, tprint, EVAL_DIR
+from w2v_pos_tagger.corpora_analyser import get_tagset
+from w2v_pos_tagger.data_loader import (
+    FORM, get_preprocessed_corpus, get_selftagged_corpus, tprint, EVAL_DIR
+)
 
 
 def concat(predictions, reference, tagset):

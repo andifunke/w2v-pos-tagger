@@ -15,7 +15,7 @@ import random
 import nltk
 
 from ClassifierBasedGermanTagger import ClassifierBasedGermanTagger
-from data_loader import TIGER_DIR, OUT_DIR
+from w2v_pos_tagger.data_loader import TIGER_DIR, OUT_DIR
 
 
 def read_corpus():

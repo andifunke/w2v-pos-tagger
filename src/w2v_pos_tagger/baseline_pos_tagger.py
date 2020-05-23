@@ -16,10 +16,10 @@ import pandas as pd
 import spacy
 from tqdm import tqdm
 
-from data_loader import OUT_DIR, get_preprocessed_corpus
-from constants import (
+from w2v_pos_tagger.constants import (
     SPACY, NLTK, TIGER, HDT, SENT_ID, STTS, UNIV, STTS_UNI_MAP_EXTENDED, KEYS, PREDICTIONS
 )
+from w2v_pos_tagger.data_loader import OUT_DIR, get_preprocessed_corpus
 
 
 def spacy_tagger(sentence):
