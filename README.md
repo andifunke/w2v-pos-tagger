@@ -2,16 +2,20 @@
 
 #### Single Token Part-of-Speech Tagging using Support Vector Machines and Word Embedding Features
 
+
+
 ## Content
 
-1) [Introduction](#introduction)
-2) [Setup](#2-setup)
+1) [Introduction](#1--introduction)
+2) [Setup](#2--setup)
 3) [Documentation](#3--documentation)
-   1) [Corpus Analysis and Normalization](#3.1-corpus-analysis-&-normalization)
-   2) [Baselines](#3.2-baselines)
-   3) [SVM-Tagger](#3.3-svm-tagger)
+   1) [Corpus Analysis and Normalization](#31--corpus-analysis-&-normalization)
+   2) [Baselines](#32--baselines)
+   3) [SVM-Tagger](#33-svm-tagger)
 
-## Introduction
+
+
+## 1 — Introduction
 
 **w2v-pos-tagger** is a project submission to an NLP & IR class in *2017*. The task description
 was as follows:
@@ -65,6 +69,8 @@ word vectors can represent syntactic language features. The project is described
 
 </P>
 
+
+
 ## 2 — Setup
 
 At first, set up a conda environment:
@@ -100,6 +106,7 @@ cp lib/NLTK-Contributions/ClassifierBasedGermanTagger/ClassifierBasedGermanTagge
 ```
 
 
+
 ## 3 — Documentation
 
 
@@ -129,7 +136,6 @@ w2vpos-svm-tagger-train
 ```
 
 
-
 ### 3.1 Corpus Analysis and Normalization
 
 To analyse the tagset of both corpora, run
@@ -149,8 +155,6 @@ This will cache the pre-processing as csv files in `corpora/out/`.
 Additionally, the script will map STTS to the Universal Tagset according to
 this mapping:
 https://github.com/slavpetrov/universal-pos-tags/blob/master/de-tiger.map
-
-
 
 
 ### 3.2 Baselines
