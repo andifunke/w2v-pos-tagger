@@ -9,8 +9,8 @@
 1) [Introduction](#1--introduction)
 2) [Setup](#2--setup)
 3) [Documentation](#3--documentation)
-   1) [Corpus Analysis and Normalization](#31--corpus-analysis-&-normalization)
-   2) [Baselines](#32--baselines)
+   1) [Corpus Analysis and Normalization](#31-corpus-analysis-and-normalization)
+   2) [Baselines](#32-baselines)
    3) [SVM-Tagger](#33-svm-tagger)
 
 
