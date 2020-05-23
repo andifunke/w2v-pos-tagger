@@ -129,3 +129,8 @@ UNIV_TAGS_BACKWARDS = {(v, k) for k, v in UNIV_TAGS.items()}
 CORPUS_BUGS = {'NNE': 'NE', 'PPOSSAT': 'PPOSAT', 'VAIZU': 'VVIZU'}
 STTS_UNI_MAP_EXTENDED = STTS_UNI_MAP.copy()
 STTS_UNI_MAP_EXTENDED.update({'NNE': 'NOUN', 'PPOSSAT': 'PRON', 'VAIZU': 'VERB'})
+
+# file suffixes
+MODEL_SUFFIX = '.model'
+CONFIG_SUFFIX = '.config'
+SCALER_SUFFIX = '.scaler'

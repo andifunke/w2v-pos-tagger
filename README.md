@@ -248,8 +248,7 @@ w2vpos-embedding-builder --epochs 30
 
 #### 3.3.2 Train a Support Vector Classifier
 
-Finally, let's train our model.
-
+Now, let's train our model. We will use the TIGER corpus as training set.
 
 ```bash
 w2vpos-svm-tagger-train
@@ -283,3 +282,15 @@ w2vpos-svm-tagger-train --help
 #  --max-iter MAX_ITER   Limit the number of iterations.
 #  --kernel {linear,poly,rbf}
 ```
+
+#### 3.3.3 Corpus annotation
+
+We can now tag the HDT corpus using our SVM models.
+
+```bash
+w2vpos-svm-tagger --model models/out/2017-12-27_15-18-26-774110_sg_50
+```
+
+The value for `--model` can either be a relative or an absolute path containing
+a single model, usually a sub-folder of `out/models/`.
+

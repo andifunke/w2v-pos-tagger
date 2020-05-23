@@ -19,7 +19,21 @@ from tqdm import tqdm
 from w2v_pos_tagger.constants import (
     SPACY, NLTK, TIGER, HDT, SENT_ID, STTS, UNIV, STTS_UNI_MAP_EXTENDED, KEYS, PREDICTIONS
 )
-from w2v_pos_tagger.data_loader import OUT_DIR, get_preprocessed_corpus
+from w2v_pos_tagger.dataio import OUT_DIR, get_preprocessed_corpus
+
+
+def parse_args() -> argparse.Namespace:
+    """
+    Parses module-specific arguments. Solves argument dependencies
+    and returns cleaned up arguments.
+
+    :returns: arguments object
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--workers', type=int, default=-1)
+    args = parser.parse_args()
+    return args
 
 
 def spacy_tagger(sentence):
@@ -65,20 +79,6 @@ def tag_corpus(corpus, tagger, workers: int = -1):
         df = pd.concat(pool.map(partial(tag_chunk, tagger=tagger), groups))
 
     return df
-
-
-def parse_args() -> argparse.Namespace:
-    """
-    Parses module-specific arguments. Solves argument dependencies
-    and returns cleaned up arguments.
-
-    :returns: arguments object
-    """
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--workers', type=int, default=-1)
-    args = parser.parse_args()
-    return args
 
 
 def main():

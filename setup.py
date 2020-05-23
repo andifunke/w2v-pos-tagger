@@ -95,7 +95,8 @@ setuptools.setup(
             'w2vpos-baseline-pos-tagger-evaluator='
             'w2v_pos_tagger.baseline_pos_tagger_evaluator:main',
             'w2vpos-embedding-builder=w2v_pos_tagger.embedding_builder:main',
-            'w2vpos-svm-tagger-train=w2v_pos_tagger.svm_tagger_train:main',
+            'w2vpos-svm-trainer=w2v_pos_tagger.svm_trainer:main',
+            'w2vpos-svm-tagger=w2v_pos_tagger.svm_tagger:main',
         ],
     },
 )

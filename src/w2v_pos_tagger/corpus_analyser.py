@@ -9,7 +9,7 @@ Additionally provides a mapping for the reduced HDT tagset.
 import pandas as pd
 
 from w2v_pos_tagger.constants import TIGER, HDT, TOKN_ID, STTS, REDU, STTS_DEFAULT
-from w2v_pos_tagger.data_loader import get_original_corpus, tprint
+from w2v_pos_tagger.dataio import get_original_corpus, tprint
 
 
 def get_tagset(df, columns):

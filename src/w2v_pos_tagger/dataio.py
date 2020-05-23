@@ -25,10 +25,10 @@ PACKAGE_DIR = Path(__file__).resolve().parent
 SRC_DIR = PACKAGE_DIR.parent
 PROJECT_DIR = SRC_DIR.parent
 CORPORA_DIR = PROJECT_DIR / 'corpora'
-OUT_DIR = CORPORA_DIR / 'out'
+OUT_DIR = PROJECT_DIR / 'out'
 EVAL_DIR = OUT_DIR / 'evaluation'
 EMBEDDINGS_DIR = OUT_DIR / 'embeddings'
-MODEL_DIR = OUT_DIR / 'model'
+MODELS_DIR = OUT_DIR / 'models'
 TIGER_DIR = CORPORA_DIR / 'tiger-conll'
 HDT_DIR = CORPORA_DIR / 'hamburg-dependency-treebank-conll'
 

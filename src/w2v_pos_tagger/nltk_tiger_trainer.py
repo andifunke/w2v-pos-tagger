@@ -2,6 +2,7 @@
 
 """
 Trains a German part-of-speech tagger on the TIGER corpus by using the ClassifierBasedGermanTagger.
+
 (https://github.com/ptnplanet/NLTK-Contributions/tree/master/ClassifierBasedGermanTagger)
 
 The training script is based on this tutorial:
@@ -15,7 +16,25 @@ import random
 import nltk
 
 from ClassifierBasedGermanTagger import ClassifierBasedGermanTagger
-from w2v_pos_tagger.data_loader import TIGER_DIR, OUT_DIR
+from w2v_pos_tagger.dataio import TIGER_DIR, OUT_DIR
+
+
+def parse_args() -> argparse.Namespace:
+    """
+    Parses module-specific arguments.
+
+    :returns: arguments object
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--evaluate', action='store_true', required=False,
+        help='Evaluate the model after training. Will reduce the number of samples for training.'
+    )
+    parser.set_defaults(evaluate=False)
+    args = parser.parse_args()
+
+    return args
 
 
 def read_corpus():
@@ -57,24 +76,6 @@ def train_tagger(corpus, evaluate=False):
         print(f'Accuracy: {accuracy:0.3f}')
 
     return tagger
-
-
-def parse_args() -> argparse.Namespace:
-    """
-    Parses module-specific arguments.
-
-    :returns: arguments object
-    """
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--evaluate', action='store_true', required=False,
-        help='Evaluate the model after training. Will reduce the number of samples for training.'
-    )
-    parser.set_defaults(evaluate=False)
-    args = parser.parse_args()
-    
-    return args
 
 
 def main():

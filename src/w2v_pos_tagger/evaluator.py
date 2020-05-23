@@ -14,10 +14,28 @@ from w2v_pos_tagger.constants import (
     PRED_TXT, PRED_TAG, GOLD_TXT, GOLD_TAG, TP, FP, FN, PREC, RECL, F1, TIGER, HDT, STTS, UNIV,
     SPACY, NLTK
 )
-from w2v_pos_tagger.corpora_analyser import get_tagset
-from w2v_pos_tagger.data_loader import (
+from w2v_pos_tagger.corpus_analyser import get_tagset
+from w2v_pos_tagger.dataio import (
     FORM, get_preprocessed_corpus, get_selftagged_corpus, tprint, EVAL_DIR
 )
+
+
+def parse_args() -> argparse.Namespace:
+    """
+    Parses module-specific arguments. Solves argument dependencies
+    and returns cleaned up arguments.
+
+    :returns: arguments object
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--analyse', action='store_true',
+        help="Analyse the tagging instead of calculating metrics."
+    )
+    parser.set_defaults(analyse=False)
+    args = parser.parse_args()
+    return args
 
 
 def concat(predictions, reference, tagset):
@@ -99,24 +117,6 @@ def analyse_tagset(df, corpus, framework, tagset):
         f'tagset: {sorted(tagset.keys())}\n'
         f'size: {len(tagset)}\n'
     )
-
-
-def parse_args() -> argparse.Namespace:
-    """
-    Parses module-specific arguments. Solves argument dependencies
-    and returns cleaned up arguments.
-
-    :returns: arguments object
-    """
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--analyse', action='store_true',
-        help="Analyse the tagging instead of calculating metrics."
-    )
-    parser.set_defaults(analyse=False)
-    args = parser.parse_args()
-    return args
 
 
 def main():

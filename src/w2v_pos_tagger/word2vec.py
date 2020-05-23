@@ -3,6 +3,7 @@
 """
 Learns word vectors from the combines TIGER and HDT corpus by applying word2vec.
 """
+
 import argparse
 import multiprocessing as mp
 from time import time
@@ -13,7 +14,7 @@ from gensim.models.word2vec import Word2Vec
 from tqdm import tqdm
 
 from w2v_pos_tagger.constants import TIGER, HDT, SENT_ID, FORM
-from w2v_pos_tagger.data_loader import get_preprocessed_corpus, EMBEDDINGS_DIR
+from w2v_pos_tagger.dataio import get_preprocessed_corpus, EMBEDDINGS_DIR
 
 
 def parse_args() -> argparse.Namespace:
@@ -99,6 +100,7 @@ def main():
     The number of trained embeddings will be the cartesian product of the
     three lists of hyperparameters: len(a) x len(c) x len(d)
     """
+
     args = parse_args()
 
     for lowercase in args.case_folding:

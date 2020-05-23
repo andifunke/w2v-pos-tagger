@@ -13,8 +13,9 @@ from gensim.models.word2vec import Word2Vec
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import SVC
 
-from w2v_pos_tagger.constants import TIGER, FORM, UNIV, UNIV_TAGS
-from w2v_pos_tagger.data_loader import MODEL_DIR, EMBEDDINGS_DIR, get_preprocessed_corpus
+from w2v_pos_tagger.constants import TIGER, FORM, UNIV, UNIV_TAGS, MODEL_SUFFIX, CONFIG_SUFFIX, \
+    SCALER_SUFFIX
+from w2v_pos_tagger.dataio import MODELS_DIR, EMBEDDINGS_DIR, get_preprocessed_corpus
 
 
 def parse_args() -> argparse.Namespace:
@@ -98,9 +99,9 @@ def main():
     t0 = time()
     dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
 
-    save_dir = MODEL_DIR / dt
-    save_dir.mkdir(exist_ok=True, parents=True)
     train_id = f"{embedding_model}_{embedding_size}{'_lc' if lowercase else ''}"
+    save_dir = MODELS_DIR / f'{dt}_{train_id}'
+    save_dir.mkdir(exist_ok=True, parents=True)
 
     X, y = trainset(
         TIGER,
@@ -114,7 +115,7 @@ def main():
         scaler = MinMaxScaler()
         scaler.fit(X)
         X = scaler.transform(X)
-        scaler_path = save_dir / f'{train_id}.scaler'
+        scaler_path = save_dir / f'{train_id}.{SCALER_SUFFIX}'
         print('Saving scaler to', scaler_path)
         with open(scaler_path, 'wb') as fp:
             pickle.dump(scaler, fp)
@@ -130,13 +131,13 @@ def main():
     print('fitting...')
     clf.fit(X, y)
 
-    model_file = save_dir / f'{train_id}.model'
+    model_file = save_dir / f'{train_id}.{MODEL_SUFFIX}'
     print('\nsaving clf to', model_file)
     with open(model_file, 'wb') as f:
         pickle.dump(clf, f)
 
     args.time_train = time() - t0
-    config_file = save_dir / f'{train_id}.config'
+    config_file = save_dir / f'{train_id}.{CONFIG_SUFFIX}'
     print('saving options to', config_file)
     with open(config_file, 'w') as fp:
         json.dump(vars(args), fp)
