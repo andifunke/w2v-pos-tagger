@@ -88,13 +88,12 @@ setuptools.setup(
     exclude_package_data={'': ['setup.cfg']},
     entry_points={
         'console_scripts': [
-            'w2vpos-analyser=w2v_pos_tagger.corpora_analyser:main',
-            'w2vpos-data-loader=w2v_pos_tagger.data_loader:main',
+            'w2vpos-analyser=w2v_pos_tagger.corpus_analyser:main',
+            'w2vpos-data-loader=w2v_pos_tagger.dataio:main',
             'w2vpos-nltk-tiger-trainer=w2v_pos_tagger.nltk_tiger_trainer:main',
-            'w2vpos-baseline-pos-tagger=w2v_pos_tagger.baseline_pos_tagger:main',
-            'w2vpos-baseline-pos-tagger-evaluator='
-            'w2v_pos_tagger.baseline_pos_tagger_evaluator:main',
-            'w2vpos-embedding-builder=w2v_pos_tagger.embedding_builder:main',
+            'w2vpos-baseline-pos-tagger=w2v_pos_tagger.baseline_tagger:main',
+            'w2vpos-baseline-evaluator=w2v_pos_tagger.evaluator:main',
+            'w2vpos-word2vec=w2v_pos_tagger.word2vec:main',
             'w2vpos-svm-trainer=w2v_pos_tagger.svm_trainer:main',
             'w2vpos-svm-tagger=w2v_pos_tagger.svm_tagger:main',
         ],
