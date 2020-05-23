@@ -5,8 +5,8 @@
 ## Content
 
 1) [Introduction](#introduction)
-2) [Setup](#2-Setup)
-3) [Documentation](#3-—-documentation)
+2) [Setup](#2-setup)
+3) [Documentation](#3--documentation)
    1) [Corpus Analysis and Normalization](#3.1-corpus-analysis-&-normalization)
    2) [Baselines](#3.2-baselines)
    3) [SVM-Tagger](#3.3-svm-tagger)
