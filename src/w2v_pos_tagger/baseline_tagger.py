@@ -112,6 +112,7 @@ def main(argv=None):
             df = tag_corpus(corpus, tagger, workers=args.workers)
 
             # --- save results ---
+            ANNOTATIONS_DIR.mkdir(exist_ok=True, parents=True)
             file_path = ANNOTATIONS_DIR / f'{name}_pos_by_{framework}.csv'
             print(f'Writing {file_path}')
             df.to_csv(file_path, index=False, sep='\t', quoting=csv.QUOTE_NONE)

@@ -12,7 +12,6 @@ python setup.py develop
 ```
 """
 
-import os
 import subprocess
 from pathlib import Path
 
@@ -25,7 +24,7 @@ URL = "https://github.com/andifunke/w2v-pos-tagger"
 README = "README.md"
 PACKAGE = "w2v_pos_tagger"
 PACKAGE_DIR = Path('./src') / PACKAGE
-DEFAULT_SPACY_MODEL = 'en'
+DEFAULT_SPACY_MODEL = 'de'
 CORPORA = Path('corpora')
 TIGER = CORPORA / 'tiger-conll'
 
@@ -33,7 +32,10 @@ TIGER = CORPORA / 'tiger-conll'
 # --- functions ---
 
 def install_spacy_model(model=DEFAULT_SPACY_MODEL):
-    subprocess.run(['python', '-m', 'spacy', 'download', model])
+    try:
+        import de_core_news_md
+    except ImportError:
+        subprocess.run(['python', '-m', 'spacy', 'download', model])
 
 
 def read_version():

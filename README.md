@@ -18,11 +18,11 @@
 
 ## 1 — Introduction
 
-**w2v-pos-tagger** is a project submission to an NLP & IR class in *2017*. The task description
+**w2v-pos-tagger** is a project submission to an NLP & IR class in 2017. The task description
 was as follows:
 
 <img align="right" width="480" height="360"
-     src="img/embedding_size_train_size__test_time__f1_micro.png" style="margin:10px"
+     src="paper/fig/embedding_size_train_size__test_time__f1_micro.png" style="margin:10px"
      alt="embedding size comparison">
 
 <p style="text-align: left;">
@@ -68,7 +68,7 @@ word vectors can represent syntactic language features. The project is described
   is based only on the token itself without context of surrounding words. A maximum F<sub>1</sub>
   micro score of 0.919 when tested on the HDT corpus could be achieved.
   > 
-  > - [paper/pos_paper_funke.pdf](paper/pos_paper_funke.pdf)
+  > → [paper/pos_paper_funke.pdf](paper/pos_paper_funke.pdf)
 
 </P>
 
@@ -76,14 +76,14 @@ word vectors can represent syntactic language features. The project is described
 
 ## 2 — Setup
 
-At first, set up a conda environment:
+Create a conda environment:
 
 ```bash
 conda env create -f environment.yml
 conda activate w2vpos
 ```
 
-For convenience install the project as a package:
+Install the python package:
 
 ```bash
 python setup.py develop
@@ -101,11 +101,11 @@ curl https://www.ims.uni-stuttgart.de/documents/ressourcen/korpora/tiger-corpus/
 curl -SL "https://corpora.uni-hamburg.de:8443/fedora/objects/file:hdt_hdt-conll/datastreams/hdt-conll-tar-xz/content?asOfDateTime=2016-02-17T15:38:47.643Z&download=true" | tar xvfJ - -C corpora
 ```
 
-In order to train an NLTK based reference model we need one more dependency:
+In order to train an NLTK based reference model one additional dependency is needed:
 
 ```bash
 git clone git@github.com:ptnplanet/NLTK-Contributions.git lib/NLTK-Contributions
-cp lib/NLTK-Contributions/ClassifierBasedGermanTagger/ClassifierBasedGermanTagger.py src/w2v-pos-tagger/
+cp lib/NLTK-Contributions/ClassifierBasedGermanTagger/ClassifierBasedGermanTagger.py src/w2v_pos_tagger/
 ```
 
 

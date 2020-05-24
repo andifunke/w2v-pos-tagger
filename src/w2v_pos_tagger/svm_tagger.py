@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-"""Applies part-of-speech tagging via a specified SVC model to the TIGER and HDT corpus."""
+"""
+Applies part-of-speech tagging via a specified SVC model to the TIGER and HDT corpus.
+"""
+
 import argparse
 import csv
 import json
@@ -8,19 +11,20 @@ import pickle
 from time import time
 from pathlib import Path
 
-from sklearn.metrics import f1_score
 from sklearn.svm import SVC
 
-from w2v_pos_tagger.dataio import trainset, tprint, get_preprocessed_corpus, OUT_DIR, \
-    ANNOTATIONS_DIR
-from w2v_pos_tagger.constants import HDT, MODEL_SUFFIX, SCALER_SUFFIX, CONFIG_SUFFIX, TIGER, UNIV, \
+from w2v_pos_tagger.dataio import trainset, get_preprocessed_corpus, ANNOTATIONS_DIR
+from w2v_pos_tagger.constants import (
+    HDT, MODEL_SUFFIX, SCALER_SUFFIX, CONFIG_SUFFIX, TIGER, UNIV,
     UNIV_TAGS_BACKWARDS, KEYS, PREDICTIONS, STTS
+)
 
 
 def parse_args() -> argparse.Namespace:
     """
-    Parses module-specific arguments. Solves argument dependencies
-    and returns cleaned up arguments.
+    Parses module-specific arguments.
+
+    Solves argument dependencies and returns cleaned up arguments.
 
     :returns: arguments object
     """
@@ -109,6 +113,7 @@ def main():
     df.UNIV = df.UNIV.map(UNIV_TAGS_BACKWARDS.get)
 
     # --- Save ---
+    ANNOTATIONS_DIR.mkdir(exist_ok=True, parents=True)
     lc = '_lc' if lowercase else ''
     file_path = ANNOTATIONS_DIR / f'{corpus}_pos_by_SVM_{architecture}_{dimensionality}{lc}.csv'
     print(f'Writing {file_path}')
