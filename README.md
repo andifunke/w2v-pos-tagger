@@ -8,7 +8,7 @@
 
 1) [Introduction](#1--introduction)
 2) [Setup](#2--setup)
-3) [Documentation](#3--documentation)
+3) [Usage](#3--usage)
    1) [Corpus Analysis and Normalization](#31-corpus-analysis-and-normalization)
    2) [Baselines](#32-baselines)
    3) [SVM-Tagger](#33-svm-tagger)
@@ -24,7 +24,7 @@ was as follows:
      src="img/embedding_size_train_size__test_time__f1_micro.png" style="margin:10px"
      alt="embedding size comparison">
 
-<p align="left">
+<p style="text-align: left;">
 
  * Train a part-of-speech tagger for the German language.
  * Use the [TIGER corpus](https://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger/)
@@ -107,7 +107,7 @@ cp lib/NLTK-Contributions/ClassifierBasedGermanTagger/ClassifierBasedGermanTagge
 
 
 
-## 3 — Documentation
+## 3 — Usage
 
 
 ### 3.0 TL;DR
@@ -176,6 +176,8 @@ To apply the spaCy and NLTK part-of-speech tagging run
 ```bash
 w2vpos-baseline-pos-tagger
 ```
+
+The annotations will be saved to `out/annotations/`.
 
 #### 3.2.2 Baseline Evaluation
 
@@ -294,3 +296,5 @@ w2vpos-svm-tagger --model models/out/2017-12-27_15-18-26-774110_sg_50
 The value for `--model` can either be a relative or an absolute path containing
 a single model, usually a sub-folder of `out/models/`.
 
+The model will predict the Part-of-Speech-tag for each token and the annotations will
+be saved to `out/annotations/`.

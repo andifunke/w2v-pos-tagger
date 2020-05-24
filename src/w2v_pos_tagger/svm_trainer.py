@@ -8,14 +8,11 @@ import pickle
 from datetime import datetime
 from time import time
 
-import numpy as np
-from gensim.models.word2vec import Word2Vec
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import SVC
 
-from w2v_pos_tagger.constants import TIGER, FORM, UNIV, UNIV_TAGS, MODEL_SUFFIX, CONFIG_SUFFIX, \
-    SCALER_SUFFIX
-from w2v_pos_tagger.dataio import MODELS_DIR, EMBEDDINGS_DIR, get_preprocessed_corpus
+from w2v_pos_tagger.constants import TIGER, MODEL_SUFFIX, CONFIG_SUFFIX, SCALER_SUFFIX
+from w2v_pos_tagger.dataio import MODELS_DIR, trainset
 
 
 def parse_args() -> argparse.Namespace:
@@ -68,25 +65,6 @@ def parse_args() -> argparse.Namespace:
     print(args)
 
     return args
-
-
-def trainset(corpus, size=0, dimensionality=25, architecture='sg', lowercase=False):
-
-    lc = '_lc' if lowercase else ''
-
-    emb_path = EMBEDDINGS_DIR / f'{architecture}_{dimensionality:03d}{lc}.w2v'
-    print('Loading embeddings from', emb_path)
-    model = Word2Vec.load(str(emb_path))
-    word_vectors = model.wv
-
-    size = None if size < 1 else size
-    df = get_preprocessed_corpus(corpus)[[FORM, UNIV]]
-    df = df[:size]
-
-    X = np.stack(df.FORM.map(word_vectors.word_vec))
-    y = df.UNIV.map(UNIV_TAGS.get).values
-
-    return X, y
 
 
 def main():

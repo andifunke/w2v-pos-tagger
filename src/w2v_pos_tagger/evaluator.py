@@ -5,6 +5,7 @@ Evaluates spaCy and NLTK tagging based on Precision, Recall, and F1 score.
 """
 
 import argparse
+import json
 from time import time
 
 import numpy as np
@@ -16,7 +17,7 @@ from w2v_pos_tagger.constants import (
 )
 from w2v_pos_tagger.corpus_analyser import get_tagset
 from w2v_pos_tagger.dataio import (
-    FORM, get_preprocessed_corpus, get_selftagged_corpus, tprint, EVAL_DIR
+    FORM, get_preprocessed_corpus, get_baseline_corpus, tprint, EVAL_DIR, get_svm_annotations
 )
 
 
@@ -29,6 +30,11 @@ def parse_args() -> argparse.Namespace:
     """
 
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--baseline', action='store_true',
+        help="Evaluate the NLTK and spaCy baselines."
+    )
+    parser.set_defaults(analyse=False)
     parser.add_argument(
         '--analyse', action='store_true',
         help="Analyse the tagging instead of calculating metrics."
@@ -100,9 +106,43 @@ def evaluate(df):
     classes.loc['weighted avg', [PREC, RECL, F1]] = cl_wavg
     classes = classes.astype({'Count': 'int', TP: 'int', FP: 'int', FN: 'int'})
 
-    # TODO:
-
     return classes
+
+
+def save_classes(classes, name):
+    file_path = (EVAL_DIR / name).with_suffix('.csv')
+    print(f"Writing to {file_path}\n")
+    EVAL_DIR.mkdir(exist_ok=True)
+    classes.to_csv(file_path, sep='\t', float_format='%.3f')
+
+
+def summarize_score(classes, corpus, name):
+    tprint(classes)
+
+    accuracy = classes.loc['sum', PREC]
+    precision = classes.loc['weighted avg', PREC]
+    recall = classes.loc['weighted avg', RECL]
+    f1_weighted = classes.loc['weighted avg', F1]
+
+    scores = dict()
+    scores['corpus'] = corpus
+    scores['test_size'] = classes.loc['sum', 'Count']
+    scores['accuracy'] = round(accuracy, 3)
+    scores['precision'] = round(precision, 3)
+    scores['recall'] = round(recall, 3)
+    scores['f1_weighted'] = round(f1_weighted, 3)
+
+    print(
+        f"Accuracy:           {classes.loc['sum', PREC]:.3f}\n"
+        f"Weighted Precision: {classes.loc['weighted avg', PREC]:.3f}\n"
+        f"Weighted Recall:    {classes.loc['weighted avg', RECL]:.3f}\n"
+        f"Weighted F1 score:  {classes.loc['weighted avg', F1]:.3f}\n"
+    )
+
+    save_path = (EVAL_DIR / name).with_suffix('.json')
+    print('writing results to', save_path)
+    with open(save_path, 'w') as f:
+        json.dump(scores, f)
 
 
 def analyse_tagset(df, corpus, framework, tagset):
@@ -126,42 +166,59 @@ def main():
     """
 
     args = parse_args()
-
     t0 = time()
-    for corpus in [TIGER, HDT]:
-        # --- load ground truth ---
-        gold = get_preprocessed_corpus(corpus)
 
-        for framework in [SPACY, NLTK]:
-            sample_size = 0
-            # --- load predictions ---
-            pred = get_selftagged_corpus(corpus, framework, show_sample=sample_size)
+    if args.baseline:
+        for corpus in [TIGER, HDT]:
+            # --- load ground truth ---
+            gold = get_preprocessed_corpus(corpus)
 
-            for tagset in [STTS, UNIV]:
-                df = concat(pred, gold, tagset)
+            for framework in [SPACY, NLTK]:
+                sample_size = 0
+                # --- load predictions ---
+                pred = get_baseline_corpus(corpus, framework, show_sample=sample_size)
 
-                if args.analyse:
-                    analyse_tagset(pred, corpus, framework, tagset)
-                    break
+                for tagset in [STTS, UNIV]:
+                    df = concat(pred, gold, tagset)
 
-                print(
-                    f">>> Evaluating Accuracy, Precision, Recall and F_1 measure for "
-                    f"{corpus}/{framework}/{tagset}.\n"
-                )
-                results = evaluate(df)
+                    if args.analyse:
+                        analyse_tagset(pred, corpus, framework, tagset)
+                        break
 
-                tprint(results)
-                print(
-                    f"Accuracy:           {results.loc['sum', PREC]:.3f}\n"
-                    f"Weighted Precision: {results.loc['weighted avg', PREC]:.3f}\n"
-                    f"Weighted Recall:    {results.loc['weighted avg', RECL]:.3f}\n"
-                    f"Weighted F1 score:  {results.loc['weighted avg', F1]:.3f}\n"
-                )
+                    print(
+                        f">>> Evaluating Accuracy, Precision, Recall and F_1 measure for "
+                        f"{corpus}/{framework}/{tagset}.\n"
+                    )
+                    classes = evaluate(df)
 
-                file_path = EVAL_DIR / f'{corpus}_{framework}_{tagset}.csv'
-                print(f"Writing to {file_path}\n")
-                EVAL_DIR.mkdir(exist_ok=True)
-                results.to_csv(file_path, sep='\t', float_format='%.3f')
+                    name = f'{corpus}_{framework}_{tagset}'
+                    save_classes(classes, name)
+                    summarize_score(classes, corpus, name=name)
+    else:
+        for pred, name in get_svm_annotations():
+            split = name.split('_')
+            corpus = split[0]
+            architecture = split[4]
+            dimensionality = split[5]
+            lowercase = len(split) == 7 and split[6] == 'lc'
+
+            # --- load ground truth ---
+            gold = get_preprocessed_corpus(corpus)
+
+            tagset = UNIV
+            df = concat(pred, gold[:len(pred)], tagset)
+
+            lc = '/lc' if lowercase else ''
+            print(
+                f">>> Evaluating Accuracy, Precision, Recall and F_1 measure for "
+                f"{corpus}/{architecture}/{dimensionality}{lc}/{tagset}.\n"
+            )
+            classes = evaluate(df)
+
+            lc = '_lc' if lowercase else ''
+            name = f'{corpus}_SVM_{architecture}_{dimensionality}{lc}_{tagset}'
+            save_classes(classes, name)
+            summarize_score(classes, corpus, name=name)
 
     print(f"All done in {time()-t0:.2f}s")
 

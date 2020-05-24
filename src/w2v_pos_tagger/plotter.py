@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
 import json
+import os
 import re
 from os import listdir
 
 import matplotlib.pyplot as plt
+import pandas as pd
 
-from w2v_pos_tagger.data_loader import *
-from w2v_pos_tagger.svm_tagger_train import get_options
+# enhanced readability
+from dataio import tprint, CORPORA_DIR
 
-# making stuff more human readable
 AXES = {
     'f1_micro': 'F_1 micro score',
     'f1_macro': 'F_1 macro score',
@@ -27,7 +28,7 @@ LABELS = {
 TITLES = {
     'embedding_model': 'Word2Vec model',
     'embedding_size': 'Dimensionality of embedding',
-    'max_iter': 'Limit training to maximum number of iterartions (max_iter)',
+    'max_iter': 'Limit training to maximum number of iterations (max_iter)',
     'scale': 'Normalizing feature space before training and testing',
     'test_size': 'Size of the Test set',
     'train_size': 'Size of the Training set',
@@ -58,7 +59,7 @@ def plot_group(df, columns, x='train_time', y='f1_micro', ylim=(0, 1), show=Fals
     (for example combined with the train_size) which will plot with a different marker shape
     for the second key.
     """
-    fname = path.join('figures', '{}__{}__{}'.format('_'.join(columns), x, y))
+    fname = os.path.join('figures', '{}__{}__{}'.format('_'.join(columns), x, y))
     multidim = len(columns) > 1
 
     fig, ax = plt.subplots()
@@ -103,7 +104,8 @@ def aggregate_group(dfs, df_descriptions, keys, to_latex=False):
     dfs can be a single DataFrame or list/tuple of DataFrame.
     prints out some interesting aggregations for given keys.
     """
-    print('********************************************************************************************************')
+    width = 200
+    print('*' * width)
     print('AGGREGATIONS FOR KEYED GROUP:', keys)
     print()
 
@@ -121,49 +123,65 @@ def aggregate_group(dfs, df_descriptions, keys, to_latex=False):
         df_f1micmax_for_group = df.loc[group['f1_micro'].idxmax()]
         # reset the index
         df_f1micmax_for_group.set_index(keys, inplace=True)
-        tprint(df_f1micmax_for_group.sort_values('f1_micro', ascending=False), to_latex=to_latex)
+        tprint(
+            df_f1micmax_for_group.sort_values('f1_micro', ascending=False),
+            to_latex=to_latex
+        )
 
         print('maximum of all columns - sorted by f1_micro:')
+
         # to avoid missing keys
-        columns_full = ['f1_micro', 'f1_macro', 'f1_weighted', 'train_time', 'train_size', 'test_time']
+        columns_full = [
+            'f1_micro', 'f1_macro', 'f1_weighted', 'train_time', 'train_size', 'test_time'
+        ]
         columns_reduced = []
         for column in columns_full:
             if column not in keys:
                 columns_reduced.append(column)
+
         df_max = group.max()[columns_reduced].sort_values('f1_micro', ascending=False)
-        tprint(df_max, to_latex=to_latex)
+        tprint(
+            df_max,
+            to_latex=to_latex
+        )
 
         print('mean of all columns - sorted by f1_micro:')
-        tprint(group.mean()[columns_reduced].sort_values('f1_micro', ascending=False), to_latex=to_latex)
+        tprint(
+            group.mean()[columns_reduced].sort_values('f1_micro', ascending=False),
+            to_latex=to_latex
+        )
 
         print('minimum train and test time - sorted by train_time:')
         columns = ['train_time', 'test_time']
         tprint(group.min()[columns].sort_values('train_time', ascending=True), to_latex=to_latex)
 
-    print('********************************************************************************************************')
+    print('*' * width)
 
 
-def svm_evaluator_main(directory=None):
+def main():
     """
-    a given directory overwrites the defaults. The function will look for all test-result files in this directory.
+    A given directory overwrites the defaults. The function will look for all test-result
+    files in this directory.
     """
+
     print('start evaluating')
-    dir_name = CORPORA_DIR if directory is None else directory
+    dir_name = CORPORA_DIR
     files = [f for f in listdir(dir_name) if re.match(r'.*_testresults_.*\.json$', f)]
 
     # loading test-results
     results = []
     for fname in files:
-        result = json.load(open(path.join(dir_name, fname)))
+        result = json.load(open(os.path.join(dir_name, fname)))
         fname_short = re.sub(r'_testresults_.*\.json$', '', fname)
         result['model'] = fname_short
 
         if not all(x in result for x in ['train_time', 'test_time']):
-            options = json.load(open(path.join(dir_name, fname_short + '_options.json')))
+            options = json.load(open(os.path.join(dir_name, fname_short + '_options.json')))
 
-            # this is to compensate a bug during testing: the testing time is saved under the same key as the
-            # training time. Therefore we reconstruct the training time from the options. If both are equal
-            # (possible for early tests) than it is considered to be the training time and test time is set to nan.
+            # this is to compensate a bug during testing: the testing time is saved under the
+            # same key as the training time. Therefore we reconstruct the training time from the
+            # options. If both are equal (possible for early tests) than it is considered to be
+            # the training time and test time is set to nan.
             if 'train_time' not in result:
                 result['train_time'] = options['time']
             if 'test_time' not in result:
@@ -177,18 +195,21 @@ def svm_evaluator_main(directory=None):
 
     # putting everything in a nice DataFrame
     df = pd.DataFrame(results)
-    df = df[['f1_micro', 'f1_macro', 'f1_weighted',
-             'train_time', 'train_size',
-             'test_time', 'test_size',
-             'embedding_size', 'embedding_model', 'lowercase', 'scale',
-             'C', 'max_iter',
-             # 'shrinking',
-             'model', ]]
+    df = df[[
+        'f1_micro', 'f1_macro', 'f1_weighted',
+        'train_time', 'train_size',
+        'test_time', 'test_size',
+        'embedding_size', 'embedding_model', 'lowercase', 'scale',
+        'C', 'max_iter',
+        # 'shrinking',
+        'model',
+    ]]
     df['train_size'].replace(to_replace={0: 888237}, inplace=True)
     df['test_size'].replace(to_replace={0: 4853410}, inplace=True)
     tprint(df.sort_values('f1_micro', ascending=False))
 
-    # since the max_iter parameter did a really bad job, we want to exclude those results from our aggregations
+    # since the max_iter parameter did a really bad job, we want to exclude those results from
+    # our aggregations
     df_nolimit = df[df.max_iter == -1]
     df_100k = df_nolimit[df_nolimit.train_size == 100000]
     df_400k = df_nolimit[df_nolimit.train_size == 400000]
@@ -196,14 +217,16 @@ def svm_evaluator_main(directory=None):
     # tprint(df_nolimit.sort_values('f1_micro', ascending=False))
 
     dfs = [df_nolimit, df_100k, df_400k, df_888k]
-    dfs_descriptions = ['all training set sizes, max_iter: no limit',
-                        'training: size: 100000, max_iter: no limit',
-                        'training: size: 400000, max_iter: no limit',
-                        'training: size: 888237, max_iter: no limit',
-                        ]
+    dfs_descriptions = [
+        'all training set sizes, max_iter: no limit',
+        'training: size: 100000, max_iter: no limit',
+        'training: size: 400000, max_iter: no limit',
+        'training: size: 888237, max_iter: no limit',
+    ]
 
     aggregate_group(dfs[0], [dfs_descriptions[0]], ['train_size'])
-    # aggregate(df_nolimit, ['test_size'])  # of little interest - most tests were done on the full corpus
+    # aggregate(df_nolimit, ['test_size'])  # of little interest - most tests were done on the
+    # full corpus
     additional_keys = []  # ['train_size']
 
     for c in [['embedding_size'], ['embedding_model'], ['lowercase'], ['scale'], ['C']]:
@@ -231,5 +254,4 @@ def svm_evaluator_main(directory=None):
 
 
 if __name__ == '__main__':
-    OPTIONS = get_options()
-    svm_evaluator_main(directory=OPTIONS['model_dir'])
+    main()

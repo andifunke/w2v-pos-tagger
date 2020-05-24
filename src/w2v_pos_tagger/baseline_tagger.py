@@ -19,7 +19,7 @@ from tqdm import tqdm
 from w2v_pos_tagger.constants import (
     SPACY, NLTK, TIGER, HDT, SENT_ID, STTS, UNIV, STTS_UNI_MAP_EXTENDED, KEYS, PREDICTIONS
 )
-from w2v_pos_tagger.dataio import OUT_DIR, get_preprocessed_corpus
+from w2v_pos_tagger.dataio import OUT_DIR, get_preprocessed_corpus, ANNOTATIONS_DIR
 
 
 def parse_args() -> argparse.Namespace:
@@ -70,9 +70,10 @@ def tag_corpus(corpus, tagger, workers: int = -1):
     """Tags a corpus (dataframe) sentence-wise tagger function."""
 
     groups = corpus.groupby(SENT_ID)
-    if workers < 1:
-        workers = mp.cpu_count()
+
+    workers = mp.cpu_count() if workers < 1 else workers
     print(f'Parallelized using {workers} workers.')
+
     ctx = mp.get_context('fork')
     with ctx.Pool(workers) as pool:
         groups = np.array_split(groups, workers)
@@ -94,7 +95,7 @@ def main():
             df = tag_corpus(corpus, tagger, workers=args.workers)
 
             # --- save results ---
-            file_path = OUT_DIR / f'{name}_pos_by_{framework}.csv'
+            file_path = ANNOTATIONS_DIR / f'{name}_pos_by_{framework}.csv'
             print(f'Writing {file_path}')
             df.to_csv(file_path, index=False, sep='\t', quoting=csv.QUOTE_NONE)
 

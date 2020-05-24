@@ -9,15 +9,17 @@ Run this script as __main__ to cache the conversions into csv files in ``./corpo
 """
 from pathlib import Path
 from time import time
+from typing import Union
 
 import numpy as np
 import pandas as pd
+from gensim.models.word2vec import Word2Vec
 from pandarallel import pandarallel
 from tabulate import tabulate
 
 from w2v_pos_tagger.constants import (
     SPACY, NLTK, TIGER, HDT, MINIMAL, DEFAULT, PREPROCESSED, PREDICTIONS, SENT_ID,
-    TOKN_ID, FORM, LEMM, STTS, UNIV, CORP, KEYS, CORPUS_BUGS, STTS_UNI_MAP
+    TOKN_ID, FORM, LEMM, STTS, UNIV, CORP, KEYS, CORPUS_BUGS, STTS_UNI_MAP, UNIV_TAGS
 )
 
 # --- project paths ---
@@ -29,6 +31,7 @@ OUT_DIR = PROJECT_DIR / 'out'
 EVAL_DIR = OUT_DIR / 'evaluation'
 EMBEDDINGS_DIR = OUT_DIR / 'embeddings'
 MODELS_DIR = OUT_DIR / 'models'
+ANNOTATIONS_DIR = OUT_DIR / 'annotations'
 TIGER_DIR = CORPORA_DIR / 'tiger-conll'
 HDT_DIR = CORPORA_DIR / 'hamburg-dependency-treebank-conll'
 
@@ -37,7 +40,7 @@ FILES = {
     TIGER: [TIGER_DIR / 'tiger_release_aug07.corrected.16012013.conll09'],
     HDT: [HDT_DIR / f for f in ['part_A.conll', 'part_B.conll', 'part_C.conll']],
     PREPROCESSED: lambda corpus: OUT_DIR / f'{corpus}_preprocessed.csv',
-    PREDICTIONS: lambda corpus, framework: OUT_DIR / f'{corpus}_pos_by_{framework}.csv'
+    PREDICTIONS: lambda corpus, framework: ANNOTATIONS_DIR / f'{corpus}_pos_by_{framework}.csv'
 }
 
 
@@ -67,7 +70,7 @@ def get_preprocessed_corpus(corpus):
     )
 
 
-def get_selftagged_corpus(corpus=TIGER, framework=SPACY, show_sample=0):
+def get_baseline_corpus(corpus=TIGER, framework=SPACY, show_sample=0):
     assert corpus in {TIGER, HDT}, f'{corpus} is an unknown corpus.'
     assert framework in {SPACY, NLTK}, f'{framework} is an unknown framework.'
 
@@ -79,6 +82,22 @@ def get_selftagged_corpus(corpus=TIGER, framework=SPACY, show_sample=0):
     if show_sample:
         tprint(df, show_sample)
     return df
+
+
+def get_svm_annotations(show_sample=0):
+
+    annotations = [file for file in ANNOTATIONS_DIR.iterdir() if 'SVM' in file.as_posix()]
+
+    for file in annotations:
+        print(f'Reading annotated corpus from {file}')
+        df = pd.read_csv(
+            file, sep="\t", dtype={SENT_ID: int, TOKN_ID: int},
+            skip_blank_lines=True, quotechar='\x07', na_filter=False
+        )
+        if show_sample:
+            tprint(df, show_sample)
+
+        yield df, file.stem
 
 
 def get_original_corpus(corpus, print_sample=0, raw=False):
@@ -141,23 +160,45 @@ def get_original_corpus(corpus, print_sample=0, raw=False):
     return df
 
 
-def tprint(df: pd.DataFrame, head=0, to_latex=False):
+def trainset(corpus, size=0, dimensionality=25, architecture='sg', lowercase=False):
+
+    lc = '_lc' if lowercase else ''
+
+    emb_path = EMBEDDINGS_DIR / f'{architecture}_{dimensionality:03d}{lc}.w2v'
+    print('Loading embeddings from', emb_path)
+    model = Word2Vec.load(str(emb_path))
+    word_vectors = model.wv
+
+    size = None if size < 1 else size
+    df = get_preprocessed_corpus(corpus)[[FORM, UNIV]]
+    df = df[:size]
+
+    X = np.stack(df.FORM.map(word_vectors.word_vec))
+    y = df.UNIV.map(UNIV_TAGS.get).values
+
+    return X, y
+
+
+def tprint(data: Union[dict, pd.DataFrame], head=0, to_latex=False):
     """Prints a DataFrame as a well formatted table."""
 
+    if isinstance(data, dict):
+        data = pd.Series(data).to_frame()
+
     if head > 0:
-        df = df.head(head)
+        data = data.head(head)
     elif head < 0:
-        df = df.tail(-head)
+        data = data.tail(-head)
 
     formats = [".0f"] + [
         ".3f" if dt in [np.dtype('float64'), np.dtype('float32')]
         else ".0f"
-        for dt in df.dtypes
+        for dt in data.dtypes
     ]
-    print(tabulate(df, headers="keys", tablefmt="pipe", floatfmt=formats) + '\n')
+    print(tabulate(data, headers="keys", tablefmt="pipe", floatfmt=formats) + '\n')
 
     if to_latex:
-        print(df.to_latex(bold_rows=True))
+        print(data.to_latex(bold_rows=True))
 
 
 def main():

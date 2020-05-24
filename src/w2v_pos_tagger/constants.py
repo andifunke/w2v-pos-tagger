@@ -123,7 +123,7 @@ UNIV_TAGS = {
     'VERB': 10,
     'X': 11
 }
-UNIV_TAGS_BACKWARDS = {(v, k) for k, v in UNIV_TAGS.items()}
+UNIV_TAGS_BACKWARDS = {v: k for k, v in UNIV_TAGS.items()}
 
 # corpus fixes
 CORPUS_BUGS = {'NNE': 'NE', 'PPOSSAT': 'PPOSAT', 'VAIZU': 'VVIZU'}

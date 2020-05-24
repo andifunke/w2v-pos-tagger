@@ -15,7 +15,7 @@ import random
 
 import nltk
 
-from ClassifierBasedGermanTagger import ClassifierBasedGermanTagger
+from w2v_pos_tagger.ClassifierBasedGermanTagger import ClassifierBasedGermanTagger
 from w2v_pos_tagger.dataio import TIGER_DIR, OUT_DIR
 
 
