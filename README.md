@@ -114,25 +114,31 @@ cp lib/NLTK-Contributions/ClassifierBasedGermanTagger/ClassifierBasedGermanTagge
 
 ```bash
 # describe the copora and their labels
-w2vpos-corpora-analyser
+w2vpos-analyser
 
 # preprocess the corpora
-w2vpos-data-loader
+w2vpos-preprocessing
 
 # train an NLTK baseline model
 w2vpos-nltk-tiger-trainer
 
 # tag the corpora with spaCy and NLTK
-w2vpos-baseline-pos-tagger
+w2vpos-baseline-tagger
 
 # evaluate the reference inference
-w2vpos-baseline-pos-tagger-evaluator
+w2vpos-evaluator --baseline
 
-# learn distributed word vectors as features for our classifier
-w2vpos-embedding-builder
+# learn distributed word vectors as features for the classifier
+w2vpos-word2vec
 
 # train a SVM classifier levearaging those features
-w2vpos-svm-tagger-train
+w2vpos-svm-trainer
+
+# tag the HDT corpus with an SVM model
+w2vpos-svm-tagger --model models/out/2017-12-27_15-18-26-774110_sg_50
+
+# evaluate the performance of all trained models
+w2vpos-evaluator
 ```
 
 
