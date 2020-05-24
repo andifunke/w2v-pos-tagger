@@ -60,13 +60,13 @@ word vectors can represent syntactic language features. The project is described
   Retrieval" (HHU 2017)  
   [paper/pos_paper_funke.pdf](paper/pos_paper_funke.pdf)
 
-  > **Abstract:**  
-  *Part-of-speech tagging (POS) is a common technique in Natural Language Processing pipelines.
+  **Abstract:**  
+  > Part-of-speech tagging (POS) is a common technique in Natural Language Processing pipelines.
   It enriches a corpus with grammatical information which can be exploited not only for syntactic
   but also for semantic evaluation. In this paper we propose an SVM based POS-tagger trained
   on the TIGER corpus using word embeddings of small dimensionality as input data. The feature-set
   is based only on the token itself without context of surrounding words. A maximum F<sub>1</sub>
-  micro score of 0.919 when tested on the HDT corpus could be achieved.*
+  micro score of 0.919 when tested on the HDT corpus could be achieved.
 
 </P>
 
