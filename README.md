@@ -141,13 +141,13 @@ w2vpos-svm-tagger-train
 To analyse the tagset of both corpora, run
 
 ```bash
-w2vpos-corpora-analyser
+w2vpos-analyser
 ```
 
 To normalize and fix a few issues in the corpora and to persist the results run
 
 ```bash
-w2vpos-data-loader
+w2vpos-preprocessing
 ```
 
 This will cache the pre-processing as csv files in `corpora/out/`.
@@ -174,7 +174,7 @@ The newly trained NLTK tagger will be saved to `corpora/out/nltk_german_classifi
 To apply the spaCy and NLTK part-of-speech tagging run
 
 ```bash
-w2vpos-baseline-pos-tagger
+w2vpos-baseline-tagger
 ```
 
 The annotations will be saved to `out/annotations/`.
@@ -182,7 +182,7 @@ The annotations will be saved to `out/annotations/`.
 #### 3.2.2 Baseline Evaluation
 
 ```bash
-w2vpos-baseline-pos-tagger-evaluator
+w2vpos-evaluator --baseline
 ```
 
 will measure the performance of the newly tagged corpora against the ground truth
@@ -194,8 +194,6 @@ on several related metrics:
 * F<sub>1</sub> measure (weighted)
 
 The evaluation results are saved to `corpora/out/evaluation/`.
-
-The script expects that `w2vpos-baseline-pos-tagger` has already been run.
 
 
 ### 3.3 SVM-Tagger
@@ -209,7 +207,7 @@ Since we will be using word vectors as features for the SVM we will learn an emb
 space from the combined TIGER and HDT corpus by applying good old word2vec.
 
 ```bash
-w2vpos-embedding-builder
+w2vpos-word2vec
 ```
 
 will generate 16 (default) different word embeddings using the following hyperparmeter sets:
@@ -236,7 +234,7 @@ will generate 16 (default) different word embeddings using the following hyperpa
 The hyperparameters can be customized. For details:
 
 ```bash
-w2vpos-embedding-builder --help
+w2vpos-word2vec --help
 ```
 
 The embeddings are saved to `corpora/out/embeddings/`.
@@ -245,7 +243,7 @@ The original project trained the embedding for 5 epochs. You may want to increas
 the number of iterations over the corpus for better performance:
 
 ```bash
-w2vpos-embedding-builder --epochs 30
+w2vpos-word2vec --epochs 30
 ```
 
 #### 3.3.2 Train a Support Vector Classifier
@@ -253,7 +251,7 @@ w2vpos-embedding-builder --epochs 30
 Now, let's train our model. We will use the TIGER corpus as training set.
 
 ```bash
-w2vpos-svm-tagger-train
+w2vpos-svm-trainer
 ```
 
 The hyperparameters of the SVM can be partly customized. You can chose one of the 
@@ -261,7 +259,7 @@ pretrained words embeddings and other training parameters. Start with the defaul
 and then find additional information in the script's help.
 
 ```bash
-w2vpos-svm-tagger-train --help
+w2vpos-svm-trainer --help
 
 # optional arguments:
 #  -h, --help            show this help message and exit
@@ -298,3 +296,16 @@ a single model, usually a sub-folder of `out/models/`.
 
 The model will predict the Part-of-Speech-tag for each token and the annotations will
 be saved to `out/annotations/`.
+
+#### 3.3.4 Evaluate annotations
+
+```bash
+w2vpos-evaluator
+```
+
+will evaluate all previously annotated corpora, print and save a
+summary to `out/evaluation`.
+
+#### 3.3.5 Plot model scores
+
+todo
