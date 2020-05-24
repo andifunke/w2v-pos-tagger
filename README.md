@@ -12,6 +12,7 @@
    1) [Corpus Analysis and Normalization](#31-corpus-analysis-and-normalization)
    2) [Baselines](#32-baselines)
    3) [SVM-Tagger](#33-svm-tagger)
+4) [Model Selection](#4--model-selection)
 
 
 
@@ -59,7 +60,7 @@ word vectors can represent syntactic language features. The project is described
   Retrieval" (HHU 2017)  
   [paper/pos_paper_funke.pdf](paper/pos_paper_funke.pdf)
 
-  **Abstract:**  
+  > **Abstract:**  
   *Part-of-speech tagging (POS) is a common technique in Natural Language Processing pipelines.
   It enriches a corpus with grammatical information which can be exploited not only for syntactic
   but also for semantic evaluation. In this paper we propose an SVM based POS-tagger trained
@@ -131,14 +132,14 @@ w2vpos evaluate --baseline
 # learn distributed word vectors as features for the classifier
 w2vpos train --word2vec
 
-# train a SVM classifier levearaging those features
+# train a SVM classifier leveraging those features
 w2vpos train --svm
 
 # tag the HDT corpus with an SVM model
 w2vpos tag --svm --model out/models/2017-12-27_15-18-26-774110_sg_50
 
 # evaluate the performance of all trained models
-w2vpos evaluate --svm
+w2vpos evaluate --svm --model out/models/2017-12-27_15-18-26-774110_sg_50
 ```
 
 
@@ -315,3 +316,15 @@ summary to `out/evaluation`.
 #### 3.3.5 Plot model scores
 
 under construction
+
+
+## 4 — Model Selection
+
+A detailed overview over a large collection of models that was evaluated
+for the model selection can be found in this document:
+
+> [detailed_results_all_tests.md](detailed_results_all_tests.md)
+
+The best model from this selection with an F<sub>1</sub> score of 0.919 is available here:
+
+> https://drive.google.com/open?id=1CnyybkCYSXC7K4s8l1XGl0wX3Nd81qRo

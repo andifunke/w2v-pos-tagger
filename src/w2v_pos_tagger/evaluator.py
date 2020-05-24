@@ -21,7 +21,7 @@ from w2v_pos_tagger.dataio import (
 )
 
 
-def parse_args(argv=None) -> argparse.Namespace:
+def baseline_args(argv=None) -> argparse.Namespace:
     """
     Parses module-specific arguments. Solves argument dependencies
     and returns cleaned up arguments.
@@ -35,6 +35,21 @@ def parse_args(argv=None) -> argparse.Namespace:
         help="Analyse the tagging instead of calculating metrics."
     )
     parser.set_defaults(analyse=False)
+    args = parser.parse_args(argv)
+    return args
+
+
+def svm_args(argv=None) -> argparse.Namespace:
+    """
+    Parses module-specific arguments. Solves argument dependencies
+    and returns cleaned up arguments.
+
+    :returns: arguments object
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-m', '--model', type=str, required=True)
+    parser.add_argument('--corpus', type=str, default=HDT, choices=[HDT, TIGER])
     args = parser.parse_args(argv)
     return args
 
@@ -160,7 +175,7 @@ def baseline(argv=None):
     STTS and Universal tagsets can be evaluated.
     """
 
-    args = parse_args(argv)
+    args = baseline_args(argv)
     t0 = time()
 
     for corpus in [TIGER, HDT]:
@@ -193,31 +208,32 @@ def baseline(argv=None):
 
 
 def svm(argv=None):
+    args = svm_args(argv)
     t0 = time()
 
-    for pred, name in get_svm_annotations():
-        split = name.split('_')
-        corpus = split[0]
-        architecture = split[4]
-        dimensionality = split[5]
-        lowercase = len(split) == 7 and split[6] == 'lc'
+    pred, name = get_svm_annotations(args.model, args.corpus)
+    split = name.split('_')
+    corpus = split[0]
+    architecture = split[4]
+    dimensionality = split[5]
+    lowercase = len(split) == 7 and split[6] == 'lc'
 
-        # --- load ground truth ---
-        gold = get_preprocessed_corpus(corpus)
+    # --- load ground truth ---
+    gold = get_preprocessed_corpus(corpus)
 
-        tagset = UNIV
-        df = concat(pred, gold[:len(pred)], tagset)
+    tagset = UNIV
+    df = concat(pred, gold[:len(pred)], tagset)
 
-        lc = '/lc' if lowercase else ''
-        print(
-            f">>> Evaluating Accuracy, Precision, Recall and F_1 measure for "
-            f"{corpus}/{architecture}/{dimensionality}{lc}/{tagset}.\n"
-        )
-        classes = evaluate(df)
+    lc = '/lc' if lowercase else ''
+    print(
+        f">>> Evaluating Accuracy, Precision, Recall and F_1 measure for "
+        f"{corpus}/{architecture}/{dimensionality}{lc}/{tagset}.\n"
+    )
+    classes = evaluate(df)
 
-        lc = '_lc' if lowercase else ''
-        name = f'{corpus}_SVM_{architecture}_{dimensionality}{lc}_{tagset}'
-        save_classes(classes, name)
-        summarize_score(classes, corpus, name=name)
+    lc = '_lc' if lowercase else ''
+    name = f'{corpus}_SVM_{architecture}_{dimensionality}{lc}_{tagset}'
+    save_classes(classes, name)
+    summarize_score(classes, corpus, name=name)
 
     print(f"All done in {time()-t0:.2f}s")
