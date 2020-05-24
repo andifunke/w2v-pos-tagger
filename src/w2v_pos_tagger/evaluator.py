@@ -21,7 +21,7 @@ from w2v_pos_tagger.dataio import (
 )
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv=None) -> argparse.Namespace:
     """
     Parses module-specific arguments. Solves argument dependencies
     and returns cleaned up arguments.
@@ -31,16 +31,11 @@ def parse_args() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--baseline', action='store_true',
-        help="Evaluate the NLTK and spaCy baselines."
-    )
-    parser.set_defaults(analyse=False)
-    parser.add_argument(
         '--analyse', action='store_true',
         help="Analyse the tagging instead of calculating metrics."
     )
     parser.set_defaults(analyse=False)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     return args
 
 
@@ -159,69 +154,70 @@ def analyse_tagset(df, corpus, framework, tagset):
     )
 
 
-def main():
+def baseline(argv=None):
     """
     Evaluates the tagging with several metrics. Each corpus for each framework.
     STTS and Universal tagsets can be evaluated.
     """
 
-    args = parse_args()
+    args = parse_args(argv)
     t0 = time()
 
-    if args.baseline:
-        for corpus in [TIGER, HDT]:
-            # --- load ground truth ---
-            gold = get_preprocessed_corpus(corpus)
+    for corpus in [TIGER, HDT]:
+        # --- load ground truth ---
+        gold = get_preprocessed_corpus(corpus)
 
-            for framework in [SPACY, NLTK]:
-                sample_size = 0
-                # --- load predictions ---
-                pred = get_baseline_corpus(corpus, framework, show_sample=sample_size)
+        for framework in [SPACY, NLTK]:
+            sample_size = 0
+            # --- load predictions ---
+            pred = get_baseline_corpus(corpus, framework, show_sample=sample_size)
 
-                for tagset in [STTS, UNIV]:
-                    df = concat(pred, gold, tagset)
+            for tagset in [STTS, UNIV]:
+                df = concat(pred, gold, tagset)
 
-                    if args.analyse:
-                        analyse_tagset(pred, corpus, framework, tagset)
-                        break
+                if args.analyse:
+                    analyse_tagset(pred, corpus, framework, tagset)
+                    break
 
-                    print(
-                        f">>> Evaluating Accuracy, Precision, Recall and F_1 measure for "
-                        f"{corpus}/{framework}/{tagset}.\n"
-                    )
-                    classes = evaluate(df)
+                print(
+                    f">>> Evaluating Accuracy, Precision, Recall and F_1 measure for "
+                    f"{corpus}/{framework}/{tagset}.\n"
+                )
+                classes = evaluate(df)
 
-                    name = f'{corpus}_{framework}_{tagset}'
-                    save_classes(classes, name)
-                    summarize_score(classes, corpus, name=name)
-    else:
-        for pred, name in get_svm_annotations():
-            split = name.split('_')
-            corpus = split[0]
-            architecture = split[4]
-            dimensionality = split[5]
-            lowercase = len(split) == 7 and split[6] == 'lc'
-
-            # --- load ground truth ---
-            gold = get_preprocessed_corpus(corpus)
-
-            tagset = UNIV
-            df = concat(pred, gold[:len(pred)], tagset)
-
-            lc = '/lc' if lowercase else ''
-            print(
-                f">>> Evaluating Accuracy, Precision, Recall and F_1 measure for "
-                f"{corpus}/{architecture}/{dimensionality}{lc}/{tagset}.\n"
-            )
-            classes = evaluate(df)
-
-            lc = '_lc' if lowercase else ''
-            name = f'{corpus}_SVM_{architecture}_{dimensionality}{lc}_{tagset}'
-            save_classes(classes, name)
-            summarize_score(classes, corpus, name=name)
+                name = f'{corpus}_{framework}_{tagset}'
+                save_classes(classes, name)
+                summarize_score(classes, corpus, name=name)
 
     print(f"All done in {time()-t0:.2f}s")
 
 
-if __name__ == '__main__':
-    main()
+def svm(argv=None):
+    t0 = time()
+
+    for pred, name in get_svm_annotations():
+        split = name.split('_')
+        corpus = split[0]
+        architecture = split[4]
+        dimensionality = split[5]
+        lowercase = len(split) == 7 and split[6] == 'lc'
+
+        # --- load ground truth ---
+        gold = get_preprocessed_corpus(corpus)
+
+        tagset = UNIV
+        df = concat(pred, gold[:len(pred)], tagset)
+
+        lc = '/lc' if lowercase else ''
+        print(
+            f">>> Evaluating Accuracy, Precision, Recall and F_1 measure for "
+            f"{corpus}/{architecture}/{dimensionality}{lc}/{tagset}.\n"
+        )
+        classes = evaluate(df)
+
+        lc = '_lc' if lowercase else ''
+        name = f'{corpus}_SVM_{architecture}_{dimensionality}{lc}_{tagset}'
+        save_classes(classes, name)
+        summarize_score(classes, corpus, name=name)
+
+    print(f"All done in {time()-t0:.2f}s")

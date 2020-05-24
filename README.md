@@ -114,31 +114,31 @@ cp lib/NLTK-Contributions/ClassifierBasedGermanTagger/ClassifierBasedGermanTagge
 
 ```bash
 # describe the copora and their labels
-w2vpos-analyser
+w2vpos analyse
 
 # preprocess the corpora
-w2vpos-preprocessing
+w2vpos preprocess
 
 # train an NLTK baseline model
-w2vpos-nltk-tiger-trainer
+w2vpos train --baseline
 
 # tag the corpora with spaCy and NLTK
-w2vpos-baseline-tagger
+w2vpos tag --baseline
 
 # evaluate the reference inference
-w2vpos-evaluator --baseline
+w2vpos evaluate --baseline
 
 # learn distributed word vectors as features for the classifier
-w2vpos-word2vec
+w2vpos train --word2vec
 
 # train a SVM classifier levearaging those features
-w2vpos-svm-trainer
+w2vpos train --svm
 
 # tag the HDT corpus with an SVM model
-w2vpos-svm-tagger --model models/out/2017-12-27_15-18-26-774110_sg_50
+w2vpos tag --svm --model out/models/2017-12-27_15-18-26-774110_sg_50
 
 # evaluate the performance of all trained models
-w2vpos-evaluator
+w2vpos evaluate --svm
 ```
 
 
@@ -147,13 +147,13 @@ w2vpos-evaluator
 To analyse the tagset of both corpora, run
 
 ```bash
-w2vpos-analyser
+w2vpos analys
 ```
 
 To normalize and fix a few issues in the corpora and to persist the results run
 
 ```bash
-w2vpos-preprocessing
+w2vpos preprocess
 ```
 
 This will cache the pre-processing as csv files in `corpora/out/`.
@@ -172,7 +172,7 @@ NLP frameworks such as `spaCy` and `NLTK`. In order to provide a comparable NLTK
 tagger we will train it first.
 
 ```bash
-w2vpos-nltk-tiger-trainer
+w2vpos train --baseline
 ```
 
 The newly trained NLTK tagger will be saved to `corpora/out/nltk_german_classifier_data.pickle`.
@@ -180,7 +180,7 @@ The newly trained NLTK tagger will be saved to `corpora/out/nltk_german_classifi
 To apply the spaCy and NLTK part-of-speech tagging run
 
 ```bash
-w2vpos-baseline-tagger
+w2vpos tag --baseline
 ```
 
 The annotations will be saved to `out/annotations/`.
@@ -188,7 +188,7 @@ The annotations will be saved to `out/annotations/`.
 #### 3.2.2 Baseline Evaluation
 
 ```bash
-w2vpos-evaluator --baseline
+w2vpos evaluate --baseline
 ```
 
 will measure the performance of the newly tagged corpora against the ground truth
@@ -213,7 +213,7 @@ Since we will be using word vectors as features for the SVM we will learn an emb
 space from the combined TIGER and HDT corpus by applying good old word2vec.
 
 ```bash
-w2vpos-word2vec
+w2vpos train --word2vec
 ```
 
 will generate 16 (default) different word embeddings using the following hyperparmeter sets:
@@ -240,7 +240,7 @@ will generate 16 (default) different word embeddings using the following hyperpa
 The hyperparameters can be customized. For details:
 
 ```bash
-w2vpos-word2vec --help
+w2vpos train --word2vec --help
 ```
 
 The embeddings are saved to `corpora/out/embeddings/`.
@@ -249,7 +249,7 @@ The original project trained the embedding for 5 epochs. You may want to increas
 the number of iterations over the corpus for better performance:
 
 ```bash
-w2vpos-word2vec --epochs 30
+w2vpos train --word2vec --epochs 30
 ```
 
 #### 3.3.2 Train a Support Vector Classifier
@@ -257,7 +257,7 @@ w2vpos-word2vec --epochs 30
 Now, let's train our model. We will use the TIGER corpus as training set.
 
 ```bash
-w2vpos-svm-trainer
+w2vpos train --svm
 ```
 
 The hyperparameters of the SVM can be partly customized. You can chose one of the 
@@ -265,7 +265,7 @@ pretrained words embeddings and other training parameters. Start with the defaul
 and then find additional information in the script's help.
 
 ```bash
-w2vpos-svm-trainer --help
+w2vpos train --svm --help
 
 # optional arguments:
 #  -h, --help            show this help message and exit
@@ -294,7 +294,7 @@ w2vpos-svm-trainer --help
 We can now tag the HDT corpus using our SVM models.
 
 ```bash
-w2vpos-svm-tagger --model models/out/2017-12-27_15-18-26-774110_sg_50
+w2vpos tag --svm --model out/models/2017-12-27_15-18-26-774110_sg_50
 ```
 
 The value for `--model` can either be a relative or an absolute path containing
@@ -306,7 +306,7 @@ be saved to `out/annotations/`.
 #### 3.3.4 Evaluate annotations
 
 ```bash
-w2vpos-evaluator
+w2vpos evaluate --svm
 ```
 
 will evaluate all previously annotated corpora, print and save a
@@ -314,4 +314,4 @@ summary to `out/evaluation`.
 
 #### 3.3.5 Plot model scores
 
-todo
+under construction

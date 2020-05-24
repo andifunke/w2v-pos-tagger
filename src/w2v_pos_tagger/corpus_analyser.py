@@ -31,7 +31,7 @@ def compare_to_stts(corpus, df, tagset_key=STTS):
     print(f"STTS tags missing in {corp}/{tagset_key}: {sorted(STTS_DEFAULT - tagset)}\n")
 
 
-def main():
+def main(argv=None):
     print(f"STTS tagset:\n{sorted(STTS_DEFAULT)}")
     print(f"length: {len(STTS_DEFAULT)}\n")
 

@@ -17,7 +17,7 @@ from w2v_pos_tagger.constants import TIGER, HDT, SENT_ID, FORM
 from w2v_pos_tagger.dataio import get_preprocessed_corpus, EMBEDDINGS_DIR
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv=None) -> argparse.Namespace:
     """
     Parses module-specific arguments. Solves argument dependencies
     and returns cleaned up arguments.
@@ -44,7 +44,7 @@ def parse_args() -> argparse.Namespace:
         '-e', '--epochs', type=int, default=5,
         help="Number of word2vec training iterations."
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     print(args)
     args.architecture = [int(a == 'sg') for a in args.architecture]
@@ -87,7 +87,7 @@ def sentences_from_corpus(corpus: str, lowercase: bool = False) -> List[List[str
     return sentences
 
 
-def main():
+def main(argv=None):
     """
     Trains a word2vec model from both corpora.
 
@@ -101,7 +101,8 @@ def main():
     three lists of hyperparameters: len(a) x len(c) x len(d)
     """
 
-    args = parse_args()
+    args = parse_args(argv)
+    tqdm.pandas()
 
     for lowercase in args.case_folding:
         lc = '_lc' if lowercase else ''
@@ -132,6 +133,4 @@ def main():
 
 
 if __name__ == '__main__':
-    tqdm.pandas()
-
     main()

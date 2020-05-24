@@ -201,8 +201,12 @@ def tprint(data: Union[dict, pd.DataFrame], head=0, to_latex=False):
         print(data.to_latex(bold_rows=True))
 
 
-def main():
+def main(argv=None):
     """Loads the original corpora, applies normalization and caches the process in csv files."""
+    try:
+        pandarallel.initialize(progress_bar=True, use_memory_fs=True)
+    except SystemError:
+        pandarallel.initialize(progress_bar=True)
 
     OUT_DIR.mkdir(exist_ok=True)
 
@@ -215,9 +219,4 @@ def main():
 
 
 if __name__ == '__main__':
-    try:
-        pandarallel.initialize(progress_bar=True, use_memory_fs=True)
-    except SystemError:
-        pandarallel.initialize(progress_bar=True)
-
     main()

@@ -15,7 +15,7 @@ from w2v_pos_tagger.constants import TIGER, MODEL_SUFFIX, CONFIG_SUFFIX, SCALER_
 from w2v_pos_tagger.dataio import MODELS_DIR, trainset
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv=None) -> argparse.Namespace:
     """
     Parses module-specific arguments. Solves argument dependencies
     and returns cleaned up arguments.
@@ -61,14 +61,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--max-iter', default=-1, type=int, help="Limit the number of iterations.")
     parser.add_argument('--kernel', default='rbf', type=str, choices=['linear', 'poly', 'rbf'])
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     print(args)
 
     return args
 
 
-def main():
-    args = parse_args()
+def main(argv=None):
+    args = parse_args(argv)
 
     embedding_size = args.dimensionality
     embedding_model = args.architecture

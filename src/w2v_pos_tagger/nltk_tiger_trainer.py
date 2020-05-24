@@ -19,7 +19,7 @@ from w2v_pos_tagger.ClassifierBasedGermanTagger import ClassifierBasedGermanTagg
 from w2v_pos_tagger.dataio import TIGER_DIR, OUT_DIR
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv=None) -> argparse.Namespace:
     """
     Parses module-specific arguments.
 
@@ -32,7 +32,7 @@ def parse_args() -> argparse.Namespace:
         help='Evaluate the model after training. Will reduce the number of samples for training.'
     )
     parser.set_defaults(evaluate=False)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     return args
 
@@ -67,7 +67,7 @@ def train_tagger(corpus, evaluate=False):
 
     train_sents, test_sents = tagged_sents[split_size:], tagged_sents[:split_size]
 
-    print('Training POS tagger on TIGER corpus')
+    print('Training NLTK POS tagger on the TIGER corpus')
     tagger = ClassifierBasedGermanTagger(train=train_sents)
 
     if evaluate:
@@ -78,8 +78,8 @@ def train_tagger(corpus, evaluate=False):
     return tagger
 
 
-def main():
-    args = parse_args() 
+def main(argv=None):
+    args = parse_args(argv)
     evaluate = args.evaluate
 
     corpus = read_corpus()

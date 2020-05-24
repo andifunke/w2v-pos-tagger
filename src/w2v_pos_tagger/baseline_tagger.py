@@ -22,7 +22,11 @@ from w2v_pos_tagger.constants import (
 from w2v_pos_tagger.dataio import OUT_DIR, get_preprocessed_corpus, ANNOTATIONS_DIR
 
 
-def parse_args() -> argparse.Namespace:
+_SPACY = None
+_NLTK = None
+
+
+def parse_args(argv=None) -> argparse.Namespace:
     """
     Parses module-specific arguments. Solves argument dependencies
     and returns cleaned up arguments.
@@ -32,7 +36,7 @@ def parse_args() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--workers', type=int, default=-1)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     return args
 
 
@@ -82,8 +86,21 @@ def tag_corpus(corpus, tagger, workers: int = -1):
     return df
 
 
-def main():
-    args = parse_args()
+def main(argv=None):
+    global _SPACY, _NLTK
+
+    args = parse_args(argv)
+    tqdm.pandas()
+
+    # --- load nlp frameworks ---
+    print('Loading', SPACY)
+    _SPACY = spacy.load('de')
+
+    print('Loading', NLTK)
+    with open(OUT_DIR / 'nltk_german_classifier_data.pickle', 'rb') as fp:
+        _NLTK = pickle.load(fp)
+
+    t0 = time()
 
     # --- apply spacy and nltk on Tiger and HDT ---
     for name in [TIGER, HDT]:
@@ -99,18 +116,8 @@ def main():
             print(f'Writing {file_path}')
             df.to_csv(file_path, index=False, sep='\t', quoting=csv.QUOTE_NONE)
 
+    print(f"Done in {time() - t0:0.2f}s")
+
 
 if __name__ == '__main__':
-    tqdm.pandas()
-
-    # --- load nlp frameworks ---
-    print('Loading', SPACY)
-    _SPACY = spacy.load('de')
-
-    print('Loading', NLTK)
-    with open(OUT_DIR / 'nltk_german_classifier_data.pickle', 'rb') as fp:
-        _NLTK = pickle.load(fp)
-
-    t0 = time()
     main()
-    print(f"Done in {time() - t0:0.2f}s")
