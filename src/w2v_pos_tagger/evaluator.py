@@ -136,7 +136,7 @@ def summarize_score(classes, corpus, name):
 
     scores = dict()
     scores['corpus'] = corpus
-    scores['test_size'] = classes.loc['sum', 'Count']
+    scores['test_size'] = int(classes.loc['sum', 'Count'])
     scores['accuracy'] = round(accuracy, 3)
     scores['precision'] = round(precision, 3)
     scores['recall'] = round(recall, 3)

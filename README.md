@@ -150,7 +150,7 @@ w2vpos evaluate --svm --model out/models/2017-12-27_15-18-26-774110_sg_50
 To analyse the tagset of both corpora, run
 
 ```bash
-w2vpos analys
+w2vpos analyse
 ```
 
 To normalize and fix a few issues in the corpora and to persist the results run
