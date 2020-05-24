@@ -56,9 +56,9 @@ F<sub>1</sub> score of 0.919 for the best models. The approach demonstrates how 
 word vectors can represent syntactic language features. The project is described in:
 
 * **A. Funke**: *Single Token Part-of-Speech Tagging using Support Vector Machines and
-  Word Embedding Features*. Course paper for "Natural Language Processing and Information
-  Retrieval" (HHU 2017)  
-  [paper/pos_paper_funke.pdf](paper/pos_paper_funke.pdf)
+  Word Embedding Features*.   
+  Course paper for "Natural Language Processing and Information
+  Retrieval" (HHU 2017).
 
   **Abstract:**  
   > Part-of-speech tagging (POS) is a common technique in Natural Language Processing pipelines.
@@ -67,6 +67,8 @@ word vectors can represent syntactic language features. The project is described
   on the TIGER corpus using word embeddings of small dimensionality as input data. The feature-set
   is based only on the token itself without context of surrounding words. A maximum F<sub>1</sub>
   micro score of 0.919 when tested on the HDT corpus could be achieved.
+  > 
+  > - [paper/pos_paper_funke.pdf](paper/pos_paper_funke.pdf)
 
 </P>
 
