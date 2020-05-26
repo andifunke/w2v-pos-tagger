@@ -4,7 +4,8 @@ nltk==3.4.5
 numpy==1.16.6
 pandas==1.0.3
 pandarallel==1.4.8
-scikit-learn==0.22.1
+scikit-learn==0.17.1
+scipy==1.2.3
 spacy==1.10.1
 tabulate==0.8.7
 tqdm==4.44.1

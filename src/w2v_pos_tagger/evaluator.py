@@ -211,28 +211,23 @@ def svm(argv=None):
     args = svm_args(argv)
     t0 = time()
 
-    pred, name = get_svm_annotations(args.model, args.corpus)
-    split = name.split('_')
-    corpus = split[0]
-    architecture = split[4]
-    dimensionality = split[5]
-    lowercase = len(split) == 7 and split[6] == 'lc'
+    model = args.model
+    corpus = args.corpus
+    pred = get_svm_annotations(model, corpus)
 
     # --- load ground truth ---
-    gold = get_preprocessed_corpus(corpus)
+    gold = get_preprocessed_corpus(args.corpus)
 
     tagset = UNIV
     df = concat(pred, gold[:len(pred)], tagset)
 
-    lc = '/lc' if lowercase else ''
     print(
-        f">>> Evaluating Accuracy, Precision, Recall and F_1 measure for "
-        f"{corpus}/{architecture}/{dimensionality}{lc}/{tagset}.\n"
+        f">>> Evaluating Accuracy, Precision, Recall and F_1 measure of "
+        f"model {model} on corpus {corpus}.\n"
     )
     classes = evaluate(df)
 
-    lc = '_lc' if lowercase else ''
-    name = f'{corpus}_SVM_{architecture}_{dimensionality}{lc}_{tagset}'
+    name = f'{corpus}_{model}'
     save_classes(classes, name)
     summarize_score(classes, corpus, name=name)
 

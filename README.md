@@ -244,6 +244,19 @@ The hyperparameters can be customized. For details:
 
 ```bash
 w2vpos train --word2vec --help
+
+# optional arguments:
+#   -h, --help            show this help message and exit
+#   -a {cb,sg} [{cb,sg} ...], --architecture {cb,sg} [{cb,sg} ...]
+#                         Choice(s) for word2vec architecture: cbow ('cb')
+#                         and/or skip-gram ('sg').
+#   -c {none,lower} [{none,lower} ...], --case-folding {none,lower} [{none,lower} ...]
+#                         Choice(s) for case folding: no case folding ('none')
+#                         or lowercasing ('lower').
+#   -d DIMENSIONALITY [DIMENSIONALITY ...], --dimensionality DIMENSIONALITY [DIMENSIONALITY ...]
+#                         Choice(s) for embedding sizes: list of int > 0.
+#   -e EPOCHS, --epochs EPOCHS
+#                         Number of word2vec training iterations.
 ```
 
 The embeddings are saved to `corpora/out/embeddings/`.
@@ -278,9 +291,9 @@ w2vpos train --svm --help
 #  -d DIMENSIONALITY, --dimensionality DIMENSIONALITY
 #  --lowercase
 #  --no-lowercase
-#  --train_size TRAIN_SIZE
+#  --train-size TRAIN_SIZE
 #                        Train only on a slice of the trainset with length
-#                        `train_size`.
+#                        `train-size`.
 #  --shrinking
 #  --no-shrinking
 #  --scale               Normalize the feature vectors.

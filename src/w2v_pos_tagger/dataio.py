@@ -84,20 +84,19 @@ def get_baseline_corpus(corpus=TIGER, framework=SPACY, show_sample=0):
     return df
 
 
-def get_svm_annotations(show_sample=0):
+def get_svm_annotations(model, corpus, show_sample=0):
 
-    annotations = [file for file in ANNOTATIONS_DIR.iterdir() if 'SVM' in file.as_posix()]
+    file = ANNOTATIONS_DIR / f'{corpus}_pos_by_{model}.csv'
 
-    for file in annotations:
-        print(f'Reading annotated corpus from {file}')
-        df = pd.read_csv(
-            file, sep="\t", dtype={SENT_ID: int, TOKN_ID: int},
-            skip_blank_lines=True, quotechar='\x07', na_filter=False
-        )
-        if show_sample:
-            tprint(df, show_sample)
+    print(f'Reading annotated corpus from {file}')
+    df = pd.read_csv(
+        file, sep="\t", dtype={SENT_ID: int, TOKN_ID: int},
+        skip_blank_lines=True, quotechar='\x07', na_filter=False
+    )
+    if show_sample:
+        tprint(df, show_sample)
 
-        yield df, file.stem
+    return df
 
 
 def get_original_corpus(corpus, print_sample=0, raw=False):
@@ -160,13 +159,27 @@ def get_original_corpus(corpus, print_sample=0, raw=False):
     return df
 
 
-def trainset(corpus, size=0, dimensionality=25, architecture='sg', lowercase=False):
+def featureset(
+        corpus, size=0, dimensionality=25, architecture='sg', lowercase=False, embedding_path=None
+):
+    """
+    Returns the feature matrix and target vector for a given corpus.
 
-    lc = '_lc' if lowercase else ''
+    The size of the corpus can be reduced with the `size` parameter.
+    """
 
-    emb_path = EMBEDDINGS_DIR / f'{architecture}_{dimensionality:03d}{lc}.w2v'
-    print('Loading embeddings from', emb_path)
-    model = Word2Vec.load(str(emb_path))
+    if embedding_path is not None:
+        if not Path(embedding_path).is_absolute():
+            embedding_path = EMBEDDINGS_DIR / embedding_path
+        if not embedding_path.exists():
+            raise ValueError(f'Embedding path {embedding_path} does not exits.')
+
+    if embedding_path is None:
+        lc = '_lc' if lowercase else ''
+        embedding_path = EMBEDDINGS_DIR / f'{architecture}_{dimensionality:03d}{lc}.w2v'
+
+    print('Loading embeddings from', embedding_path)
+    model = Word2Vec.load(str(embedding_path))
     word_vectors = model.wv
 
     size = None if size < 1 else size

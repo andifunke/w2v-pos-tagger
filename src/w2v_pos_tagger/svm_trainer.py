@@ -12,7 +12,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import SVC
 
 from w2v_pos_tagger.constants import TIGER, MODEL_SUFFIX, CONFIG_SUFFIX, SCALER_SUFFIX
-from w2v_pos_tagger.dataio import MODELS_DIR, trainset
+from w2v_pos_tagger.dataio import MODELS_DIR, featureset
 
 
 def parse_args(argv=None) -> argparse.Namespace:
@@ -37,7 +37,7 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument('--no-lowercase', dest='lowercase', action='store_false')
     parser.set_defaults(lowercase=False)
     parser.add_argument(
-        '--train_size', default=0, type=int,
+        '--train-size', default=0, type=int,
         help='Train only on a slice of the trainset with length `train_size`.'
     )
 
@@ -77,11 +77,11 @@ def main(argv=None):
     t0 = time()
     dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
 
-    train_id = f"{embedding_model}_{embedding_size}{'_lc' if lowercase else ''}"
-    save_dir = MODELS_DIR / f'{dt}_{train_id}'
+    train_id = f"{dt}_{embedding_model}_{embedding_size}{'_lc' if lowercase else ''}"
+    save_dir = MODELS_DIR / train_id
     save_dir.mkdir(exist_ok=True, parents=True)
 
-    X, y = trainset(
+    X, y = featureset(
         TIGER,
         size=args.train_size,
         dimensionality=embedding_size,
@@ -109,13 +109,13 @@ def main(argv=None):
     print('fitting...')
     clf.fit(X, y)
 
-    model_file = save_dir / f'{train_id}.{MODEL_SUFFIX}'
-    print('\nsaving clf to', model_file)
+    model_file = save_dir / f'{train_id}{MODEL_SUFFIX}'
+    print('\nsaving model to', model_file)
     with open(model_file, 'wb') as f:
         pickle.dump(clf, f)
 
     args.time_train = time() - t0
-    config_file = save_dir / f'{train_id}.{CONFIG_SUFFIX}'
+    config_file = save_dir / f'{train_id}{CONFIG_SUFFIX}'
     print('saving options to', config_file)
     with open(config_file, 'w') as fp:
         json.dump(vars(args), fp)
