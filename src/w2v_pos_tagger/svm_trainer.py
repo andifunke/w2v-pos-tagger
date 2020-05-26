@@ -31,6 +31,13 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.set_defaults(verbose=True)
 
     # --- Choice of pretrained embedding variation ---
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        '-e', '--embedding', type=str, required=False, default=None,
+        help="Path to a pretrained embedding. Will override architecture and dimensionality."
+             "Make sure to set the `--lowercase` flag if the embedding was trained on a "
+             "lower-cased vocabulary.",
+    )
     parser.add_argument('-a', '--architecture', default='sg', type=str, choices=['cb', 'sg'])
     parser.add_argument('-d', '--dimensionality', default=25, type=int)
     parser.add_argument('--lowercase', dest='lowercase', action='store_true')
@@ -61,6 +68,11 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument('--max-iter', default=-1, type=int, help="Limit the number of iterations.")
     parser.add_argument('--kernel', default='rbf', type=str, choices=['linear', 'poly', 'rbf'])
 
+    parser.add_argument(
+        '-m', '--model', type=str, required=False, default=None,
+        help="Specify a custom name for the model. Otherwise a unique model id will be created.",
+    )
+
     args = parser.parse_args(argv)
     print(args)
 
@@ -77,7 +89,11 @@ def main(argv=None):
     t0 = time()
     dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
 
-    train_id = f"{dt}_{embedding_model}_{embedding_size}{'_lc' if lowercase else ''}"
+    if args.model is None:
+        train_id = f"{dt}_{embedding_model}_{embedding_size}{'_lc' if lowercase else ''}"
+    else:
+        train_id = args.model
+
     save_dir = MODELS_DIR / train_id
     save_dir.mkdir(exist_ok=True, parents=True)
 
@@ -86,7 +102,8 @@ def main(argv=None):
         size=args.train_size,
         dimensionality=embedding_size,
         architecture=embedding_model,
-        lowercase=lowercase
+        lowercase=lowercase,
+        embedding_path=args.embedding
     )
 
     if args.scale:

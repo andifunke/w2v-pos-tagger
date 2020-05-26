@@ -186,6 +186,9 @@ def featureset(
     df = get_preprocessed_corpus(corpus)[[FORM, UNIV]]
     df = df[:size]
 
+    if lowercase:
+        df.FORM = df.FORM.str.lower()
+
     X = np.stack(df.FORM.map(word_vectors.word_vec))
     y = df.UNIV.map(UNIV_TAGS.get).values
 

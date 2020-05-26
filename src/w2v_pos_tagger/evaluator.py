@@ -121,7 +121,7 @@ def evaluate(df):
 
 def save_classes(classes, name):
     file_path = (EVAL_DIR / name).with_suffix('.csv')
-    print(f"Writing to {file_path}\n")
+    print(f"Writing detailed results to {file_path}\n")
     EVAL_DIR.mkdir(exist_ok=True)
     classes.to_csv(file_path, sep='\t', float_format='%.3f')
 
@@ -150,7 +150,7 @@ def summarize_score(classes, corpus, name):
     )
 
     save_path = (EVAL_DIR / name).with_suffix('.json')
-    print('writing results to', save_path)
+    print('Writing summary to', save_path)
     with open(save_path, 'w') as f:
         json.dump(scores, f)
 

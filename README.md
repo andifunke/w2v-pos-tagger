@@ -310,7 +310,7 @@ w2vpos train --svm --help
 We can now tag the HDT corpus using our SVM models.
 
 ```bash
-w2vpos tag --svm --model out/models/2017-12-27_15-18-26-774110_sg_50
+w2vpos tag --svm --model best_model
 ```
 
 The value for `--model` can either be a relative or an absolute path containing
@@ -322,7 +322,7 @@ be saved to `out/annotations/`.
 #### 3.3.4 Evaluate annotations
 
 ```bash
-w2vpos evaluate --svm
+w2vpos evaluate --svm --model best_model
 ```
 
 will evaluate all previously annotated corpora, print and save a
