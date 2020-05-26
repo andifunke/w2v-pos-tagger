@@ -31,8 +31,7 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.set_defaults(verbose=True)
 
     # --- Choice of pretrained embedding variation ---
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
+    parser.add_argument(
         '-e', '--embedding', type=str, required=False, default=None,
         help="Path to a pretrained embedding. Will override architecture and dimensionality."
              "Make sure to set the `--lowercase` flag if the embedding was trained on a "
