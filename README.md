@@ -135,13 +135,13 @@ w2vpos evaluate --baseline
 w2vpos train --word2vec
 
 # train a SVM classifier leveraging those features
-w2vpos train --svm
+w2vpos train --svm --model my_first_pos_tagger
 
 # tag the HDT corpus with an SVM model
-w2vpos tag --svm --model out/models/2017-12-27_15-18-26-774110_sg_50
+w2vpos tag --svm --model my_first_pos_tagger
 
 # evaluate the performance of all trained models
-w2vpos evaluate --svm --model out/models/2017-12-27_15-18-26-774110_sg_50
+w2vpos evaluate --svm --model my_first_pos_tagger
 ```
 
 
@@ -273,7 +273,7 @@ w2vpos train --word2vec --epochs 30
 Now, let's train our model. We will use the TIGER corpus as training set.
 
 ```bash
-w2vpos train --svm
+w2vpos train --svm --model my_first_pos_tagger
 ```
 
 The hyperparameters of the SVM can be partly customized. You can chose one of the 
@@ -284,25 +284,33 @@ and then find additional information in the script's help.
 w2vpos train --svm --help
 
 # optional arguments:
-#  -h, --help            show this help message and exit
-#  --verbose
-#  --no-verbose
-#  -a {cb,sg}, --architecture {cb,sg}
-#  -d DIMENSIONALITY, --dimensionality DIMENSIONALITY
-#  --lowercase
-#  --no-lowercase
-#  --train-size TRAIN_SIZE
-#                        Train only on a slice of the trainset with length
-#                        `train-size`.
-#  --shrinking
-#  --no-shrinking
-#  --scale               Normalize the feature vectors.
-#  --no-scale
-#  --C C                 Soft-margin parameter.
-#  --cache-size CACHE_SIZE
-#                        Specify the size of the kernel cache (in MB).
-#  --max-iter MAX_ITER   Limit the number of iterations.
-#  --kernel {linear,poly,rbf}
+#   -h, --help            show this help message and exit
+#   --verbose
+#   --no-verbose
+#   -e EMBEDDING, --embedding EMBEDDING
+#                         Path to a pretrained embedding. Will override
+#                         architecture and dimensionality.Make sure to set the
+#                         `--lowercase` flag if the embedding was trained on a
+#                         lower-cased vocabulary.
+#   -a {cb,sg}, --architecture {cb,sg}
+#   -d DIMENSIONALITY, --dimensionality DIMENSIONALITY
+#   --lowercase
+#   --no-lowercase
+#   --train-size TRAIN_SIZE
+#                         Train only on a slice of the trainset with length
+#                         `train_size`.
+#   --shrinking
+#   --no-shrinking
+#   --scale               Normalize the feature vectors.
+#   --no-scale
+#   --C C                 Soft-margin parameter.
+#   --cache-size CACHE_SIZE
+#                         Specify the size of the kernel cache (in MB).
+#   --max-iter MAX_ITER   Limit the number of iterations.
+#   --kernel {linear,poly,rbf}
+#   -m MODEL, --model MODEL
+#                         Specify a custom name for the model. Otherwise a
+#                         unique model id will be created.
 ```
 
 #### 3.3.3 Corpus annotation
@@ -310,7 +318,7 @@ w2vpos train --svm --help
 We can now tag the HDT corpus using our SVM models.
 
 ```bash
-w2vpos tag --svm --model best_model
+w2vpos tag --svm --model my_first_pos_tagger
 ```
 
 The value for `--model` can either be a relative or an absolute path containing
@@ -322,7 +330,7 @@ be saved to `out/annotations/`.
 #### 3.3.4 Evaluate annotations
 
 ```bash
-w2vpos evaluate --svm --model best_model
+w2vpos evaluate --svm --model my_first_pos_tagger
 ```
 
 will evaluate all previously annotated corpora, print and save a
