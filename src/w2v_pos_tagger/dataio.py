@@ -169,7 +169,8 @@ def featureset(
     """
 
     if embedding_path is not None:
-        if not Path(embedding_path).is_absolute():
+        embedding_path = Path(embedding_path)
+        if not embedding_path.is_absolute():
             embedding_path = EMBEDDINGS_DIR / embedding_path
         if not embedding_path.exists():
             raise ValueError(f'Embedding path {embedding_path} does not exits.')

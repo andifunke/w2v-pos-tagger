@@ -12,7 +12,7 @@ class Parser(object):
                         'Support Vector Machines and Word Embedding Features',
             usage="w2vpos <command> [<args>]\n"
                   "\nexample:\n"
-                  "\n``w2vpos tag --svm --model out/models/2017-12-27_15-18-26-774110_sg_50``"
+                  "\n``w2vpos tag --svm --model 2017-12-27_15-18-26-774110_sg_50``"
         )
         parser.add_argument(
             'command', type=str, choices=['analyse', 'preprocess', 'train', 'tag', 'evaluate'],
