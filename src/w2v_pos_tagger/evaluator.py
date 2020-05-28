@@ -152,7 +152,7 @@ def summarize_score(classes, corpus, name):
     save_path = (EVAL_DIR / name).with_suffix('.json')
     print('Writing summary to', save_path)
     with open(save_path, 'w') as f:
-        json.dump(scores, f)
+        json.dump(scores, f, indent=2)
 
 
 def analyse_tagset(df, corpus, framework, tagset):
