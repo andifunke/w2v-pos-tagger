@@ -87,7 +87,7 @@ def main(argv=None):
         return
 
     # --- Load features ---
-    embedding_path = config.get('embedding_file')
+    embedding_path = config.get('embedding')
     if embedding_path is not None:
         embedding_path = Path(embedding_path)
         if not embedding_path.is_absolute():
