@@ -81,15 +81,16 @@ def parse_args(argv=None) -> argparse.Namespace:
 def main(argv=None):
     args = parse_args(argv)
 
-    embedding_size = args.dimensionality
-    embedding_model = args.architecture
-    lowercase = args.lowercase
+    if args.embedding:
+        args.dimensionality = None
+        args.architecture = None
 
     t0 = time()
     dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
 
     if args.model is None:
-        train_id = f"{dt}_{embedding_model}_{embedding_size}{'_lc' if lowercase else ''}"
+        lc = '_lc' if args.lowercase else ''
+        train_id = f"{dt}_{args.architecture}_{args.dimensionality}{lc}"
     else:
         train_id = args.model
 
@@ -99,11 +100,12 @@ def main(argv=None):
     X, y = featureset(
         TIGER,
         size=args.train_size,
-        dimensionality=embedding_size,
-        architecture=embedding_model,
-        lowercase=lowercase,
+        dimensionality=args.dimensionality,
+        architecture=args.architecture,
+        lowercase=args.lowercase,
         embedding_path=args.embedding
     )
+    args.dimensionality = X.shape[1]
 
     if args.scale:
         scaler = MinMaxScaler()
@@ -134,7 +136,7 @@ def main(argv=None):
     config_file = save_dir / f'{train_id}{CONFIG_SUFFIX}'
     print('saving options to', config_file)
     with open(config_file, 'w') as fp:
-        json.dump(vars(args), fp)
+        json.dump(vars(args), fp, indent=2)
 
     print(f"Done in {args.time_train:.3f}s")
 
