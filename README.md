@@ -51,8 +51,8 @@ within the bounds of these constrains.
 Defining a design for the feature engineering was part of the challenge. I decided for unigram word
 vectors as input features for the SVM and applied a comprehensive hyperparameter search for 
 embedding types, vector sizes and SVM hyperparameters. This simple, yet effective, approach of 
-learning a hyperplane separation through the (RBF-transformed) embedding space gave an 
-F<sub>1</sub> score of 0.919 for the best models. The approach demonstrates how well static unigram
+learning a hyperplane separation through the (RBF-transformed) embedding space gave a weighted
+F<sub>1</sub> score of 0.914 for the best models. The approach demonstrates how well static unigram
 word vectors can represent syntactic language features. The project is described in:
 
 * **Andreas Funke**: *Single Token Part-of-Speech Tagging using Support Vector Machines and
@@ -348,6 +348,6 @@ for the model selection can be found in this document:
 
 > [detailed_results_all_tests.md](detailed_results_all_tests.md)
 
-The best model from this selection with an F<sub>1</sub> score of 0.919 is available here:
+The best model from this selection with a weighted F<sub>1</sub> score of 0.914 is available here:
 
 > https://drive.google.com/open?id=1CnyybkCYSXC7K4s8l1XGl0wX3Nd81qRo
