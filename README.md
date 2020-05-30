@@ -55,7 +55,7 @@ learning a hyperplane separation through the (RBF-transformed) embedding space g
 F<sub>1</sub> score of 0.919 for the best models. The approach demonstrates how well static unigram
 word vectors can represent syntactic language features. The project is described in:
 
-* **A. Funke**: *Single Token Part-of-Speech Tagging using Support Vector Machines and
+* **Andreas Funke**: *Single Token Part-of-Speech Tagging using Support Vector Machines and
   Word Embedding Features*.   
   Course paper for "Natural Language Processing and Information
   Retrieval" (HHU 2017).
