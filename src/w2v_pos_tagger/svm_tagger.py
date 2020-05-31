@@ -44,15 +44,10 @@ def parse_args(argv=None) -> argparse.Namespace:
     return args
 
 
-def main(argv=None):
-    """A given directory and/or filename overwrites the defaults."""
+def load_model(model):
+    """Returns a tuple containing (abs_path, model, scaler, config, metrics)."""
 
-    print('Start Part-of-Speech Tagging')
-
-    args = parse_args(argv)
-
-    # --- Load model ---
-    model_path = Path(args.model)
+    model_path = Path(model)
     if not model_path.is_absolute():
         model_path = MODELS_DIR / model_path
     if not (model_path.exists() and model_path.is_dir()):
@@ -61,9 +56,9 @@ def main(argv=None):
     files = [f for f in model_path.iterdir()]
 
     clf = None
+    scaler = None
     config = None
     metrics = None
-    scaler = None
 
     for file in files:
         if file.suffix == MODEL_SUFFIX:
@@ -82,6 +77,19 @@ def main(argv=None):
             print('loading metrics from', file)
             with open(file) as fp:
                 metrics = json.load(fp)
+
+    return model_path, clf, scaler, config, metrics
+
+
+def main(argv=None):
+    """A given directory and/or filename overwrites the defaults."""
+
+    print('Start Part-of-Speech Tagging')
+
+    args = parse_args(argv)
+
+    # --- Load model ---
+    model_path, clf, scaler, config, metrics = load_model(args.model)
 
     if clf is None:
         print("no clf file found. exit")
@@ -143,7 +151,9 @@ def main(argv=None):
     if metrics is not None:
         metrics[corpus] = dict(test_size=args.test_size, test_time=test_time)
         metrics_file = f"{config.get('model', 'model')}{METRICS_SUFFIX}"
-        with open(model_path / metrics_file, 'w') as fp:
+        file_path = model_path / metrics_file
+        with open(file_path, 'w') as fp:
+            print(f'Writing {file_path}')
             json.dump(metrics, fp, indent=2)
 
 

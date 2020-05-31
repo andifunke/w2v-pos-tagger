@@ -13,12 +13,13 @@ import pandas as pd
 
 from w2v_pos_tagger.constants import (
     PRED_TXT, PRED_TAG, GOLD_TXT, GOLD_TAG, TP, FP, FN, PREC, RECL, F1, TIGER, HDT, STTS, UNIV,
-    SPACY, NLTK
+    SPACY, NLTK, METRICS_SUFFIX
 )
 from w2v_pos_tagger.corpus_analyser import get_tagset
 from w2v_pos_tagger.dataio import (
     FORM, get_preprocessed_corpus, get_baseline_corpus, tprint, EVAL_DIR, get_svm_annotations
 )
+from w2v_pos_tagger.svm_tagger import load_model
 
 
 def baseline_args(argv=None) -> argparse.Namespace:
@@ -156,6 +157,8 @@ def summarize_score(classes, corpus, tagset, model_name, file_prefix):
     with open(save_path, 'w') as f:
         json.dump(scores, f, indent=2)
 
+    return scores
+
 
 def analyse_tagset(df, corpus, framework, tagset):
     """Analyses a given tagset."""
@@ -237,12 +240,30 @@ def svm(argv=None):
 
     name = f'{corpus}_{model}'
     save_classes(classes, name)
-    summarize_score(
+    scores = summarize_score(
         classes=classes,
         corpus=corpus,
         tagset=tagset,
         model_name=model,
         file_prefix=name
     )
+
+    try:
+        model_path, _, _, config, metrics = load_model(model)
+        metrics[corpus][tagset] = dict(
+            eval_size=scores['test_size'],
+            accuracy=scores['accuracy'],
+            precision=scores['precision'],
+            recall=scores['recall'],
+            f1_weighted=scores['f1_weighted'],
+        )
+        metrics_file = f"{config.get('model', 'model')}{METRICS_SUFFIX}"
+        file_path = model_path / metrics_file
+        with open(file_path, 'w') as fp:
+            print(f'Writing {file_path}')
+            json.dump(metrics, fp, indent=2)
+    except Exception as e:
+        print(e)
+        print('Could not read/write metrics file.')
 
     print(f"All done in {time()-t0:.2f}s")
