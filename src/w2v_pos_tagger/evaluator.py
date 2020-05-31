@@ -126,7 +126,7 @@ def save_classes(classes, name):
     classes.to_csv(file_path, sep='\t', float_format='%.3f')
 
 
-def summarize_score(classes, corpus, name):
+def summarize_score(classes, corpus, tagset, model_name, file_prefix):
     tprint(classes)
 
     accuracy = classes.loc['sum', PREC]
@@ -134,22 +134,24 @@ def summarize_score(classes, corpus, name):
     recall = classes.loc['weighted avg', RECL]
     f1_weighted = classes.loc['weighted avg', F1]
 
-    scores = dict()
-    scores['corpus'] = corpus
-    scores['test_size'] = int(classes.loc['sum', 'Count'])
-    scores['accuracy'] = round(accuracy, 3)
-    scores['precision'] = round(precision, 3)
-    scores['recall'] = round(recall, 3)
-    scores['f1_weighted'] = round(f1_weighted, 3)
-
     print(
-        f"Accuracy:           {classes.loc['sum', PREC]:.3f}\n"
-        f"Weighted Precision: {classes.loc['weighted avg', PREC]:.3f}\n"
-        f"Weighted Recall:    {classes.loc['weighted avg', RECL]:.3f}\n"
-        f"Weighted F1 score:  {classes.loc['weighted avg', F1]:.3f}\n"
+        f"Accuracy:           {accuracy:.3f}\n"
+        f"Weighted Precision: {precision:.3f}\n"
+        f"Weighted Recall:    {recall:.3f}\n"
+        f"Weighted F1 score:  {f1_weighted:.3f}\n"
     )
 
-    save_path = (EVAL_DIR / name).with_suffix('.json')
+    scores = dict(
+        model=model_name,
+        corpus=corpus,
+        tagset=tagset,
+        test_size=int(classes.loc['sum', 'Count']),
+        accuracy=round(accuracy, 3),
+        precision=round(precision, 3),
+        recall=round(recall, 3),
+        f1_weighted=round(f1_weighted, 3),
+    )
+    save_path = (EVAL_DIR / file_prefix).with_suffix('.json')
     print('Writing summary to', save_path)
     with open(save_path, 'w') as f:
         json.dump(scores, f, indent=2)
@@ -202,7 +204,13 @@ def baseline(argv=None):
 
                 name = f'{corpus}_{framework}_{tagset}'
                 save_classes(classes, name)
-                summarize_score(classes, corpus, name=name)
+                summarize_score(
+                    classes=classes,
+                    corpus=corpus,
+                    tagset=tagset,
+                    model_name=framework,
+                    file_prefix=name
+                )
 
     print(f"All done in {time()-t0:.2f}s")
 
@@ -229,6 +237,12 @@ def svm(argv=None):
 
     name = f'{corpus}_{model}'
     save_classes(classes, name)
-    summarize_score(classes, corpus, name=name)
+    summarize_score(
+        classes=classes,
+        corpus=corpus,
+        tagset=tagset,
+        model_name=model,
+        file_prefix=name
+    )
 
     print(f"All done in {time()-t0:.2f}s")

@@ -7,9 +7,7 @@ from os import listdir
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
-# enhanced readability
-from dataio import tprint, CORPORA_DIR
+from dataio import tprint, EVAL_DIR
 
 AXES = {
     'f1_micro': 'F_1 micro score',
@@ -54,18 +52,19 @@ MARKERS = ('o', '^', 's', 'p')
 
 def plot_group(df, columns, x='train_time', y='f1_micro', ylim=(0, 1), show=False, log=False):
     """
-    creates a scatter plot for a given key usually with the train/test time on the x axis
+    Creates a scatter plot for a given key usually with the train/test time on the x axis
     and the f1_micro measure on the y axis. You can give in two keys at the same time
     (for example combined with the train_size) which will plot with a different marker shape
     for the second key.
     """
-    fname = os.path.join('figures', '{}__{}__{}'.format('_'.join(columns), x, y))
-    multidim = len(columns) > 1
+
+    file_name = os.path.join('figures', '{}__{}__{}'.format('_'.join(columns), x, y))
+    multidimensional = len(columns) > 1
 
     fig, ax = plt.subplots()
     for key, group in df.groupby(columns):
         # define the label for the legend
-        if multidim:
+        if multidimensional:
             label1 = LABELS[key[0]] if key[0] in LABELS else str(key[0])
             column2 = LABELS[columns[1]] if columns[1] in LABELS else str(columns[1])
             label2 = LABELS[key[1]] if key[1] in LABELS else str(key[1])
@@ -74,7 +73,7 @@ def plot_group(df, columns, x='train_time', y='f1_micro', ylim=(0, 1), show=Fals
             label = LABELS[key] if key in LABELS else key
 
         # plot each group
-        if multidim:
+        if multidimensional:
             color = COLORS[INDEXES[columns[0]].index(key[0])]
             marker = MARKERS[INDEXES[columns[1]].index(key[1])]
         else:
@@ -87,14 +86,14 @@ def plot_group(df, columns, x='train_time', y='f1_micro', ylim=(0, 1), show=Fals
     plt.title(TITLES[columns[0]] if columns[0] in TITLES else columns[0])
     plt.legend(loc=4)
 
-    print('saving', fname)
+    print('saving', file_name)
     ax.set_autoscaley_on(False)
     ax.set_ylim(ylim)
-    fig.savefig(fname + '.pdf')
+    fig.savefig(file_name + '.pdf')
     if log:
         # saving also a log scaled x-axis
         ax.set_xscale('log')
-        fig.savefig(fname + '__log.pdf')
+        fig.savefig(file_name + '__log.pdf')
     if show:
         plt.show()
 
@@ -102,8 +101,9 @@ def plot_group(df, columns, x='train_time', y='f1_micro', ylim=(0, 1), show=Fals
 def aggregate_group(dfs, df_descriptions, keys, to_latex=False):
     """
     dfs can be a single DataFrame or list/tuple of DataFrame.
-    prints out some interesting aggregations for given keys.
+    Prints out aggregations for the given keys.
     """
+
     width = 200
     print('*' * width)
     print('AGGREGATIONS FOR KEYED GROUP:', keys)
@@ -159,24 +159,26 @@ def aggregate_group(dfs, df_descriptions, keys, to_latex=False):
 
 
 def main():
-    """
-    A given directory overwrites the defaults. The function will look for all test-result
-    files in this directory.
-    """
+    """Looks for all test-result (json) files in ``out/evaluation/``."""
 
     print('start evaluating')
-    dir_name = CORPORA_DIR
-    files = [f for f in listdir(dir_name) if re.match(r'.*_testresults_.*\.json$', f)]
+    dir_name = EVAL_DIR
+    files = [f for f in dir_name.iterdir() if f.suffix == '.json']
+
+    if not files:
+        print(f"No evaluation files found in {dir_name}")
+        exit()
 
     # loading test-results
     results = []
-    for fname in files:
-        result = json.load(open(os.path.join(dir_name, fname)))
-        fname_short = re.sub(r'_testresults_.*\.json$', '', fname)
-        result['model'] = fname_short
+    for file_path in files:
+        with open(file_path) as fp:
+            result = json.load(fp)
+        file_name = re.sub(r'_testresults_.*\.json$', '', file_path)
+        result['model'] = file_name
 
         if not all(x in result for x in ['train_time', 'test_time']):
-            options = json.load(open(os.path.join(dir_name, fname_short + '_options.json')))
+            options = json.load(open(os.path.join(dir_name, file_name + '_options.json')))
 
             # this is to compensate a bug during testing: the testing time is saved under the
             # same key as the training time. Therefore we reconstruct the training time from the
@@ -195,6 +197,7 @@ def main():
 
     # putting everything in a nice DataFrame
     df = pd.DataFrame(results)
+
     df = df[[
         'f1_micro', 'f1_macro', 'f1_weighted',
         'train_time', 'train_size',
