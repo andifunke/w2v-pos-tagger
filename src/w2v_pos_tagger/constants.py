@@ -134,3 +134,4 @@ STTS_UNI_MAP_EXTENDED.update({'NNE': 'NOUN', 'PPOSSAT': 'PRON', 'VAIZU': 'VERB'}
 MODEL_SUFFIX = '.model'
 CONFIG_SUFFIX = '.config'
 SCALER_SUFFIX = '.scaler'
+METRICS_SUFFIX = '.metrics'

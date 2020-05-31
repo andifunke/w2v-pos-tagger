@@ -11,7 +11,8 @@ from time import time
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import SVC
 
-from w2v_pos_tagger.constants import TIGER, MODEL_SUFFIX, CONFIG_SUFFIX, SCALER_SUFFIX
+from w2v_pos_tagger.constants import TIGER, MODEL_SUFFIX, CONFIG_SUFFIX, SCALER_SUFFIX, \
+    METRICS_SUFFIX
 from w2v_pos_tagger.dataio import MODELS_DIR, featureset
 
 
@@ -85,18 +86,19 @@ def main(argv=None):
         args.dimensionality = None
         args.architecture = None
 
-    t0 = time()
     dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
 
     if args.model is None:
         lc = '_lc' if args.lowercase else ''
         train_id = f"{dt}_{args.architecture}_{args.dimensionality}{lc}"
+        args.model = train_id
     else:
         train_id = args.model
 
     save_dir = MODELS_DIR / train_id
     save_dir.mkdir(exist_ok=True, parents=True)
 
+    t0 = time()
     X, y = featureset(
         TIGER,
         size=args.train_size,
@@ -126,19 +128,24 @@ def main(argv=None):
 
     print('fitting...')
     clf.fit(X, y)
+    train_time = time() - t0
+    print(f"Training done in {train_time:.3f}s")
 
-    model_file = save_dir / f'{train_id}{MODEL_SUFFIX}'
-    print('\nsaving model to', model_file)
-    with open(model_file, 'wb') as f:
+    file = save_dir / f'{train_id}{MODEL_SUFFIX}'
+    print('\nsaving model to', file)
+    with open(file, 'wb') as f:
         pickle.dump(clf, f)
 
-    args.time_train = time() - t0
-    config_file = save_dir / f'{train_id}{CONFIG_SUFFIX}'
-    print('saving options to', config_file)
-    with open(config_file, 'w') as fp:
+    file = save_dir / f'{train_id}{CONFIG_SUFFIX}'
+    print('saving config to', file)
+    with open(file, 'w') as fp:
         json.dump(vars(args), fp, indent=2)
 
-    print(f"Done in {args.time_train:.3f}s")
+    metrics = dict(model=train_id, train_size=args.train_size, train_time=train_time)
+    file = save_dir / f'{train_id}{METRICS_SUFFIX}'
+    print('saving metrics to', file)
+    with open(file, 'w') as fp:
+        json.dump(metrics, fp, indent=2)
 
 
 if __name__ == '__main__':

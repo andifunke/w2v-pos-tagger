@@ -174,16 +174,10 @@ def main():
     for file_path in files:
         with open(file_path) as fp:
             result = json.load(fp)
-        file_name = re.sub(r'_testresults_.*\.json$', '', file_path)
-        result['model'] = file_name
 
         if not all(x in result for x in ['train_time', 'test_time']):
             options = json.load(open(os.path.join(dir_name, file_name + '_options.json')))
 
-            # this is to compensate a bug during testing: the testing time is saved under the
-            # same key as the training time. Therefore we reconstruct the training time from the
-            # options. If both are equal (possible for early tests) than it is considered to be
-            # the training time and test time is set to nan.
             if 'train_time' not in result:
                 result['train_time'] = options['time']
             if 'test_time' not in result:
