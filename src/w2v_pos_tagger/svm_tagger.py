@@ -16,7 +16,7 @@ from sklearn.svm import SVC
 from w2v_pos_tagger.dataio import featureset, get_preprocessed_corpus, ANNOTATIONS_DIR, MODELS_DIR
 from w2v_pos_tagger.constants import (
     HDT, MODEL_SUFFIX, SCALER_SUFFIX, CONFIG_SUFFIX, TIGER, UNIV,
-    UNIV_TAGS_BACKWARDS, KEYS, PREDICTIONS, STTS
+    UNIV_TAGS_BACKWARDS, KEYS, PREDICTIONS, STTS, METRICS_SUFFIX
 )
 
 
@@ -62,6 +62,7 @@ def main(argv=None):
 
     clf = None
     config = None
+    metrics = None
     scaler = None
 
     for file in files:
@@ -77,6 +78,10 @@ def main(argv=None):
             print('loading config from', file)
             with open(file) as fp:
                 config = json.load(fp)
+        elif file.suffix == METRICS_SUFFIX:
+            print('loading metrics from', file)
+            with open(file) as fp:
+                metrics = json.load(fp)
 
     if clf is None:
         print("no clf file found. exit")
@@ -118,7 +123,8 @@ def main(argv=None):
 
     y_pred = clf.predict(X)
 
-    print(f"Done in {time() - t0:0.2f}s")
+    test_time = time() - t0
+    print(f"Predictions done in {test_time:0.2f}s")
 
     # --- Annotate the corpus ---
     df = get_preprocessed_corpus(corpus)
@@ -133,6 +139,12 @@ def main(argv=None):
     file_path = ANNOTATIONS_DIR / f'{corpus}_pos_by_{model_path.name}.csv'
     print(f'Writing {file_path}')
     df.to_csv(file_path, index=False, sep='\t', quoting=csv.QUOTE_NONE)
+
+    if metrics is not None:
+        metrics[corpus] = dict(test_size=args.test_size, test_time=test_time)
+        metrics_file = f"{config.get('model', 'model')}{METRICS_SUFFIX}"
+        with open(model_path / metrics_file, 'w') as fp:
+            json.dump(metrics, fp, indent=2)
 
 
 if __name__ == '__main__':
