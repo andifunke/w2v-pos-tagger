@@ -29,6 +29,7 @@ PROJECT_DIR = SRC_DIR.parent
 CORPORA_DIR = PROJECT_DIR / 'corpora'
 OUT_DIR = PROJECT_DIR / 'out'
 EVAL_DIR = OUT_DIR / 'evaluation'
+IMG_DIR = EVAL_DIR / 'figures'
 EMBEDDINGS_DIR = OUT_DIR / 'embeddings'
 MODELS_DIR = OUT_DIR / 'models'
 ANNOTATIONS_DIR = OUT_DIR / 'annotations'
