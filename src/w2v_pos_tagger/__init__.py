@@ -10,4 +10,4 @@ __all__ = [
     'svm_trainer',
     'word2vec',
 ]
-__version__ = '0.1.0c1'
+__version__ = '0.1.0'

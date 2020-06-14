@@ -137,7 +137,11 @@ def main(argv=None):
     # --- Annotate the corpus ---
     df = get_preprocessed_corpus(corpus)
     df = df[KEYS[PREDICTIONS]].drop(STTS, axis=1)
-    df = df[:args.test_size]
+
+    if args.test_size > 0:
+        df = df[:args.test_size]
+
+    assert len(df) == len(y_pred), f"len(df)={len(df)} != {len(y_pred)}=len(y_pred)"
     df.loc[:, UNIV] = y_pred
     df.UNIV = df.UNIV.map(UNIV_TAGS_BACKWARDS.get)
 

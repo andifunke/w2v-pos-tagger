@@ -351,3 +351,5 @@ for the model selection can be found in this document:
 The best model from this selection with a weighted F<sub>1</sub> score of 0.914 is available here:
 
 > https://drive.google.com/open?id=1CnyybkCYSXC7K4s8l1XGl0wX3Nd81qRo
+
+To plot the results refer to `src/w2v_pos_tagger/plotter.py`
