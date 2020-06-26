@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-#
-# Copyright (c) 2019-present, Ella Media GmbH
-# All rights reserved.
-#
 """
 The recommended way to install the w2v-pos-tagger package in an existing
 environment is:
